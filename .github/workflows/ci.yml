@@ -60,7 +60,7 @@ jobs:
     needs: integration-matrix
     uses: graycoreio/github-actions-magento2/.github/workflows/integration.yaml@main
     with:
-      package_name: mage-os/module-blog
+      package_name: mageos/module-blog
       matrix: ${{ needs.integration-matrix.outputs.matrix }}
     secrets:
       composer_auth: ${{ secrets.COMPOSER_AUTH }}
