@@ -3,8 +3,24 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="MageOS\Blog\Api\Data\PostInterface"
                 type="MageOS\Blog\Model\Post"/>
+    <preference for="MageOS\Blog\Api\Data\CategoryInterface"
+                type="MageOS\Blog\Model\Category"/>
+    <preference for="MageOS\Blog\Api\Data\TagInterface"
+                type="MageOS\Blog\Model\Tag"/>
+    <preference for="MageOS\Blog\Api\Data\AuthorInterface"
+                type="MageOS\Blog\Model\Author"/>
+    <preference for="MageOS\Blog\Api\Data\PostSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
+    <preference for="MageOS\Blog\Api\Data\CategorySearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
+    <preference for="MageOS\Blog\Api\Data\TagSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
+    <preference for="MageOS\Blog\Api\Data\AuthorSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
     <preference for="MageOS\Blog\Api\PostRepositoryInterface"
                 type="MageOS\Blog\Model\PostRepository"/>
+    <preference for="MageOS\Blog\Api\UrlKeyGeneratorInterface"
+                type="MageOS\Blog\Model\UrlKeyGenerator"/>
     <preference for="MageOS\Blog\Model\UrlKeyGenerator\CollisionChecker"
                 type="MageOS\Blog\Model\UrlKeyGenerator\DbCollisionChecker"/>
 </config>
