@@ -95,49 +95,51 @@
 
             <group id="sitemap" translate="label" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Sitemap</label>
-                <field id="post_enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Include Posts</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <config_path>mageos_blog/sitemap/post/enabled</config_path>
-                </field>
-                <field id="post_frequency" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Posts — Frequency</label>
-                    <source_model>Magento\Sitemap\Model\Config\Source\Frequency</source_model>
-                    <config_path>mageos_blog/sitemap/post/frequency</config_path>
-                </field>
-                <field id="post_priority" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Posts — Priority</label>
-                    <comment>0.0 – 1.0</comment>
-                    <config_path>mageos_blog/sitemap/post/priority</config_path>
-                </field>
-                <field id="category_enabled" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Include Categories</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <config_path>mageos_blog/sitemap/category/enabled</config_path>
-                </field>
-                <field id="category_frequency" translate="label" type="select" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Categories — Frequency</label>
-                    <source_model>Magento\Sitemap\Model\Config\Source\Frequency</source_model>
-                    <config_path>mageos_blog/sitemap/category/frequency</config_path>
-                </field>
-                <field id="category_priority" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Categories — Priority</label>
-                    <config_path>mageos_blog/sitemap/category/priority</config_path>
-                </field>
-                <field id="tag_enabled" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Include Tags</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <config_path>mageos_blog/sitemap/tag/enabled</config_path>
-                </field>
-                <field id="tag_frequency" translate="label" type="select" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Tags — Frequency</label>
-                    <source_model>Magento\Sitemap\Model\Config\Source\Frequency</source_model>
-                    <config_path>mageos_blog/sitemap/tag/frequency</config_path>
-                </field>
-                <field id="tag_priority" translate="label" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Tags — Priority</label>
-                    <config_path>mageos_blog/sitemap/tag/priority</config_path>
-                </field>
+                <group id="post" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Posts</label>
+                    <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Include Posts</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="frequency" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Frequency</label>
+                        <source_model>Magento\Sitemap\Model\Config\Source\Frequency</source_model>
+                    </field>
+                    <field id="priority" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Priority</label>
+                        <comment>0.0 – 1.0</comment>
+                    </field>
+                </group>
+                <group id="category" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Categories</label>
+                    <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Include Categories</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="frequency" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Frequency</label>
+                        <source_model>Magento\Sitemap\Model\Config\Source\Frequency</source_model>
+                    </field>
+                    <field id="priority" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Priority</label>
+                        <comment>0.0 – 1.0</comment>
+                    </field>
+                </group>
+                <group id="tag" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Tags</label>
+                    <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Include Tags</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="frequency" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Frequency</label>
+                        <source_model>Magento\Sitemap\Model\Config\Source\Frequency</source_model>
+                    </field>
+                    <field id="priority" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Priority</label>
+                        <comment>0.0 – 1.0</comment>
+                    </field>
+                </group>
             </group>
 
             <group id="social" translate="label" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
