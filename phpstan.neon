@@ -4,6 +4,7 @@ parameters:
     level: 8
     paths:
         - Api
+        - Block
         - Controller
         - Model
         - Ui

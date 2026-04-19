@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">mageos_blog_post_form.mageos_blog_post_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Blog Post</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="save" class="MageOS\Blog\Block\Adminhtml\Post\Edit\SaveButton"/>
+            <button name="delete" class="MageOS\Blog\Block\Adminhtml\Post\Edit\DeleteButton"/>
+            <button name="back" class="MageOS\Blog\Block\Adminhtml\Post\Edit\BackButton"/>
+        </buttons>
+        <namespace>mageos_blog_post_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>mageos_blog_post_form.mageos_blog_post_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="mageos_blog_post_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="*/*/save"/>
+        </settings>
+        <dataProvider class="MageOS\Blog\Ui\DataProvider\Post\Form\DataProvider" name="mageos_blog_post_form_data_source">
+            <settings>
+                <requestFieldName>post_id</requestFieldName>
+                <primaryFieldName>post_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <fieldset name="general" sortOrder="10">
+        <settings>
+            <label translate="true">General</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="title" formElement="input" sortOrder="10">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Title</label>
+                <dataScope>title</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="url_key" formElement="input" sortOrder="20">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">URL Key</label>
+                <dataScope>url_key</dataScope>
+                <notice translate="true">Leave empty to auto-generate from title.</notice>
+            </settings>
+        </field>
+        <field name="status" formElement="select" sortOrder="30">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Status</label>
+                <dataScope>status</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="MageOS\Blog\Ui\Component\Listing\Column\PostStatusOptions"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="publish_date" formElement="date" sortOrder="40">
+            <settings>
+                <dataType>date</dataType>
+                <label translate="true">Publish Date</label>
+                <dataScope>publish_date</dataScope>
+            </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="showsTime" xsi:type="boolean">true</option>
+                            <option name="timeFormat" xsi:type="string">HH:mm</option>
+                            <option name="dateFormat" xsi:type="string">y-MM-dd</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
+        </field>
+        <field name="author_id" formElement="input" sortOrder="50">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Author ID</label>
+                <dataScope>author_id</dataScope>
+                <notice translate="true">Numeric ID from blog_author table. Chooser UI lands in a later task.</notice>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="content" sortOrder="20">
+        <settings>
+            <label translate="true">Content</label>
+            <collapsible>true</collapsible>
+        </settings>
+        <field name="short_content" formElement="wysiwyg" sortOrder="10">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Short Content</label>
+                <dataScope>short_content</dataScope>
+            </settings>
+            <formElements>
+                <wysiwyg>
+                    <settings>
+                        <wysiwyg>true</wysiwyg>
+                        <rows>5</rows>
+                    </settings>
+                </wysiwyg>
+            </formElements>
+        </field>
+        <field name="content" formElement="wysiwyg" sortOrder="20">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Content</label>
+                <dataScope>content</dataScope>
+            </settings>
+            <formElements>
+                <wysiwyg>
+                    <settings>
+                        <wysiwyg>true</wysiwyg>
+                        <rows>20</rows>
+                    </settings>
+                </wysiwyg>
+            </formElements>
+        </field>
+    </fieldset>
+
+    <fieldset name="images" sortOrder="30">
+        <settings>
+            <label translate="true">Images</label>
+            <collapsible>true</collapsible>
+        </settings>
+        <field name="featured_image" formElement="fileUploader" sortOrder="10">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Featured Image</label>
+                <dataScope>featured_image</dataScope>
+            </settings>
+            <formElements>
+                <fileUploader>
+                    <settings>
+                        <uploaderConfig>
+                            <param name="url" xsi:type="url" path="mageos_blog/post/uploadImage">
+                                <param name="type" xsi:type="string">featured_image</param>
+                            </param>
+                        </uploaderConfig>
+                        <allowedExtensions>jpg jpeg png gif webp svg</allowedExtensions>
+                        <maxFileSize>4194304</maxFileSize>
+                    </settings>
+                </fileUploader>
+            </formElements>
+        </field>
+        <field name="featured_image_alt" formElement="input" sortOrder="20">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Featured Image Alt Text</label>
+                <dataScope>featured_image_alt</dataScope>
+            </settings>
+        </field>
+        <field name="og_image" formElement="fileUploader" sortOrder="30">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">OpenGraph Image</label>
+                <dataScope>og_image</dataScope>
+            </settings>
+            <formElements>
+                <fileUploader>
+                    <settings>
+                        <uploaderConfig>
+                            <param name="url" xsi:type="url" path="mageos_blog/post/uploadImage">
+                                <param name="type" xsi:type="string">og_image</param>
+                            </param>
+                        </uploaderConfig>
+                        <allowedExtensions>jpg jpeg png gif webp</allowedExtensions>
+                        <maxFileSize>4194304</maxFileSize>
+                    </settings>
+                </fileUploader>
+            </formElements>
+        </field>
+    </fieldset>
+
+    <fieldset name="seo" sortOrder="40">
+        <settings>
+            <label translate="true">SEO</label>
+            <collapsible>true</collapsible>
+        </settings>
+        <field name="meta_title" formElement="input" sortOrder="10">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Meta Title</label>
+                <dataScope>meta_title</dataScope>
+            </settings>
+        </field>
+        <field name="meta_description" formElement="textarea" sortOrder="20">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Meta Description</label>
+                <dataScope>meta_description</dataScope>
+            </settings>
+        </field>
+        <field name="meta_keywords" formElement="input" sortOrder="30">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Meta Keywords</label>
+                <dataScope>meta_keywords</dataScope>
+            </settings>
+        </field>
+        <field name="meta_robots" formElement="select" sortOrder="40">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Meta Robots</label>
+                <dataScope>meta_robots</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="MageOS\Blog\Model\Config\Source\Robots"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="og_title" formElement="input" sortOrder="50">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">OpenGraph Title</label>
+                <dataScope>og_title</dataScope>
+            </settings>
+        </field>
+        <field name="og_description" formElement="textarea" sortOrder="60">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">OpenGraph Description</label>
+                <dataScope>og_description</dataScope>
+            </settings>
+        </field>
+        <field name="og_type" formElement="input" sortOrder="70">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">OpenGraph Type</label>
+                <dataScope>og_type</dataScope>
+                <notice translate="true">Default: article. Override per post when needed.</notice>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="taxonomy" sortOrder="50">
+        <settings>
+            <label translate="true">Taxonomy</label>
+            <collapsible>true</collapsible>
+        </settings>
+        <field name="category_ids" formElement="input" sortOrder="10">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Category IDs (comma-separated)</label>
+                <dataScope>category_ids</dataScope>
+                <notice translate="true">Multi-select with tree UI lands in task 2.5/2.6.</notice>
+            </settings>
+        </field>
+        <field name="tag_ids" formElement="input" sortOrder="20">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Tag IDs (comma-separated)</label>
+                <dataScope>tag_ids</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="related" sortOrder="60">
+        <settings>
+            <label translate="true">Related</label>
+            <collapsible>true</collapsible>
+        </settings>
+        <field name="related_post_ids" formElement="input" sortOrder="10">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Related Post IDs (comma-separated)</label>
+                <dataScope>related_post_ids</dataScope>
+                <notice translate="true">Nested listing UI lands in task 2.4.</notice>
+            </settings>
+        </field>
+        <field name="related_product_ids" formElement="input" sortOrder="20">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Related Product IDs (comma-separated)</label>
+                <dataScope>related_product_ids</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="stores" sortOrder="70">
+        <settings>
+            <label translate="true">Stores</label>
+            <collapsible>true</collapsible>
+        </settings>
+        <field name="store_ids" formElement="multiselect" sortOrder="10">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Store Views</label>
+                <dataScope>store_ids</dataScope>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Magento\Store\Model\Config\Source\Store"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+    </fieldset>
+</form>
