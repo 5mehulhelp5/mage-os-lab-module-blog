@@ -125,4 +125,140 @@
             <column name="is_active"/>
         </index>
     </table>
+
+    <table name="mageos_blog_post_store" resource="default" engine="innodb" comment="Post ↔ Store">
+        <column xsi:type="int" name="post_id" nullable="false" unsigned="true"/>
+        <column xsi:type="smallint" name="store_id" nullable="false" unsigned="true"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="post_id"/>
+            <column name="store_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_POST_STORE_POST_ID"
+                    table="mageos_blog_post_store" column="post_id"
+                    referenceTable="mageos_blog_post" referenceColumn="post_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_POST_STORE_STORE_ID"
+                    table="mageos_blog_post_store" column="store_id"
+                    referenceTable="store" referenceColumn="store_id"
+                    onDelete="CASCADE"/>
+        <index referenceId="MAGEOS_BLOG_POST_STORE_STORE_ID_IDX" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+
+    <table name="mageos_blog_category_store" resource="default" engine="innodb" comment="Category ↔ Store">
+        <column xsi:type="int" name="category_id" nullable="false" unsigned="true"/>
+        <column xsi:type="smallint" name="store_id" nullable="false" unsigned="true"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="category_id"/>
+            <column name="store_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_CATEGORY_STORE_CATEGORY_ID"
+                    table="mageos_blog_category_store" column="category_id"
+                    referenceTable="mageos_blog_category" referenceColumn="category_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_CATEGORY_STORE_STORE_ID"
+                    table="mageos_blog_category_store" column="store_id"
+                    referenceTable="store" referenceColumn="store_id"
+                    onDelete="CASCADE"/>
+        <index referenceId="MAGEOS_BLOG_CATEGORY_STORE_STORE_ID_IDX" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+
+    <table name="mageos_blog_tag_store" resource="default" engine="innodb" comment="Tag ↔ Store">
+        <column xsi:type="int" name="tag_id" nullable="false" unsigned="true"/>
+        <column xsi:type="smallint" name="store_id" nullable="false" unsigned="true"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="tag_id"/>
+            <column name="store_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_TAG_STORE_TAG_ID"
+                    table="mageos_blog_tag_store" column="tag_id"
+                    referenceTable="mageos_blog_tag" referenceColumn="tag_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_TAG_STORE_STORE_ID"
+                    table="mageos_blog_tag_store" column="store_id"
+                    referenceTable="store" referenceColumn="store_id"
+                    onDelete="CASCADE"/>
+        <index referenceId="MAGEOS_BLOG_TAG_STORE_STORE_ID_IDX" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+
+    <table name="mageos_blog_post_category" resource="default" engine="innodb" comment="Post ↔ Category">
+        <column xsi:type="int" name="post_id" nullable="false" unsigned="true"/>
+        <column xsi:type="int" name="category_id" nullable="false" unsigned="true"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="post_id"/>
+            <column name="category_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_POST_CATEGORY_POST_ID"
+                    table="mageos_blog_post_category" column="post_id"
+                    referenceTable="mageos_blog_post" referenceColumn="post_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_POST_CATEGORY_CATEGORY_ID"
+                    table="mageos_blog_post_category" column="category_id"
+                    referenceTable="mageos_blog_category" referenceColumn="category_id"
+                    onDelete="CASCADE"/>
+        <index referenceId="MAGEOS_BLOG_POST_CATEGORY_CATEGORY_ID_IDX" indexType="btree">
+            <column name="category_id"/>
+        </index>
+    </table>
+
+    <table name="mageos_blog_post_tag" resource="default" engine="innodb" comment="Post ↔ Tag">
+        <column xsi:type="int" name="post_id" nullable="false" unsigned="true"/>
+        <column xsi:type="int" name="tag_id" nullable="false" unsigned="true"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="post_id"/>
+            <column name="tag_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_POST_TAG_POST_ID"
+                    table="mageos_blog_post_tag" column="post_id"
+                    referenceTable="mageos_blog_post" referenceColumn="post_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_POST_TAG_TAG_ID"
+                    table="mageos_blog_post_tag" column="tag_id"
+                    referenceTable="mageos_blog_tag" referenceColumn="tag_id"
+                    onDelete="CASCADE"/>
+        <index referenceId="MAGEOS_BLOG_POST_TAG_TAG_ID_IDX" indexType="btree">
+            <column name="tag_id"/>
+        </index>
+    </table>
+
+    <table name="mageos_blog_post_related_product" resource="default" engine="innodb">
+        <column xsi:type="int" name="post_id" nullable="false" unsigned="true"/>
+        <column xsi:type="int" name="product_id" nullable="false" unsigned="true"/>
+        <column xsi:type="smallint" name="position" nullable="false" default="0"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="post_id"/>
+            <column name="product_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_POST_RP_POST_ID"
+                    table="mageos_blog_post_related_product" column="post_id"
+                    referenceTable="mageos_blog_post" referenceColumn="post_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_POST_RP_PRODUCT_ID"
+                    table="mageos_blog_post_related_product" column="product_id"
+                    referenceTable="catalog_product_entity" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+    </table>
+
+    <table name="mageos_blog_post_related_post" resource="default" engine="innodb">
+        <column xsi:type="int" name="post_id" nullable="false" unsigned="true"/>
+        <column xsi:type="int" name="related_post_id" nullable="false" unsigned="true"/>
+        <column xsi:type="smallint" name="position" nullable="false" default="0"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="post_id"/>
+            <column name="related_post_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_POST_RELATED_POST_ID"
+                    table="mageos_blog_post_related_post" column="post_id"
+                    referenceTable="mageos_blog_post" referenceColumn="post_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="MAGEOS_BLOG_POST_RELATED_RELATED_POST_ID"
+                    table="mageos_blog_post_related_post" column="related_post_id"
+                    referenceTable="mageos_blog_post" referenceColumn="post_id"
+                    onDelete="CASCADE"/>
+    </table>
 </schema>
