@@ -11,6 +11,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 interface PostRepositoryInterface
 {
+    /** @throws CouldNotSaveException */
     public function save(PostInterface $post): PostInterface;
 
     /** @throws NoSuchEntityException */

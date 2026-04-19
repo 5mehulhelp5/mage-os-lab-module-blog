@@ -11,6 +11,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 interface TagRepositoryInterface
 {
+    /** @throws CouldNotSaveException */
     public function save(TagInterface $tag): TagInterface;
 
     /** @throws NoSuchEntityException */

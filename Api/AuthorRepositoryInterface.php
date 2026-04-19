@@ -11,6 +11,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 interface AuthorRepositoryInterface
 {
+    /** @throws CouldNotSaveException */
     public function save(AuthorInterface $author): AuthorInterface;
 
     /** @throws NoSuchEntityException */

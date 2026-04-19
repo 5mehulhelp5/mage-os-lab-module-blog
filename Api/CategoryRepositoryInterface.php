@@ -11,6 +11,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 interface CategoryRepositoryInterface
 {
+    /** @throws CouldNotSaveException */
     public function save(CategoryInterface $category): CategoryInterface;
 
     /** @throws NoSuchEntityException */
