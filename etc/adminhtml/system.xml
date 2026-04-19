@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="mageos_blog" translate="label" sortOrder="300">
+            <label>Blog</label>
+        </tab>
+        <section id="mageos_blog" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Blog</label>
+            <tab>mageos_blog</tab>
+            <resource>MageOS_Blog::config</resource>
+
+            <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+
+            <group id="post" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Post Defaults</label>
+                <field id="posts_per_page" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Posts Per Page (Listings)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="default_robots" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Robots</label>
+                    <source_model>MageOS\Blog\Model\Config\Source\Robots</source_model>
+                </field>
+            </group>
+
+            <group id="sidebar" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Sidebar Widgets</label>
+                <field id="search_enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Search Box</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="search_sort_order" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Search Box — Sort Order</label>
+                    <validate>validate-digits</validate>
+                </field>
+                <field id="recent_posts_enabled" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recent Posts</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="recent_posts_sort_order" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recent Posts — Sort Order</label>
+                    <validate>validate-digits</validate>
+                </field>
+                <field id="recent_posts_count" translate="label" type="text" sortOrder="26" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recent Posts — Item Count</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="category_list_enabled" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Category List</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="category_list_sort_order" translate="label" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Category List — Sort Order</label>
+                    <validate>validate-digits</validate>
+                </field>
+                <field id="tag_cloud_enabled" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Tag Cloud</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="tag_cloud_sort_order" translate="label" type="text" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Tag Cloud — Sort Order</label>
+                    <validate>validate-digits</validate>
+                </field>
+                <field id="archive_enabled" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Archive</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="archive_sort_order" translate="label" type="text" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Archive — Sort Order</label>
+                    <validate>validate-digits</validate>
+                </field>
+            </group>
+
+            <group id="seo" translate="label" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>SEO</label>
+                <field id="og_default_type" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>OpenGraph Default Type</label>
+                </field>
+                <field id="json_ld_enabled" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable JSON-LD</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="twitter_site" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Twitter Site Handle</label>
+                    <comment>e.g. @yourhandle</comment>
+                </field>
+            </group>
+
+            <group id="sitemap" translate="label" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Sitemap</label>
+                <field id="post_enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Include Posts</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>mageos_blog/sitemap/post/enabled</config_path>
+                </field>
+                <field id="post_frequency" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Posts — Frequency</label>
+                    <source_model>Magento\Sitemap\Model\Config\Source\Frequency</source_model>
+                    <config_path>mageos_blog/sitemap/post/frequency</config_path>
+                </field>
+                <field id="post_priority" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Posts — Priority</label>
+                    <comment>0.0 – 1.0</comment>
+                    <config_path>mageos_blog/sitemap/post/priority</config_path>
+                </field>
+                <field id="category_enabled" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Include Categories</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>mageos_blog/sitemap/category/enabled</config_path>
+                </field>
+                <field id="category_frequency" translate="label" type="select" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Categories — Frequency</label>
+                    <source_model>Magento\Sitemap\Model\Config\Source\Frequency</source_model>
+                    <config_path>mageos_blog/sitemap/category/frequency</config_path>
+                </field>
+                <field id="category_priority" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Categories — Priority</label>
+                    <config_path>mageos_blog/sitemap/category/priority</config_path>
+                </field>
+                <field id="tag_enabled" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Include Tags</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>mageos_blog/sitemap/tag/enabled</config_path>
+                </field>
+                <field id="tag_frequency" translate="label" type="select" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Tags — Frequency</label>
+                    <source_model>Magento\Sitemap\Model\Config\Source\Frequency</source_model>
+                    <config_path>mageos_blog/sitemap/tag/frequency</config_path>
+                </field>
+                <field id="tag_priority" translate="label" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Tags — Priority</label>
+                    <config_path>mageos_blog/sitemap/tag/priority</config_path>
+                </field>
+            </group>
+
+            <group id="social" translate="label" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Social Share</label>
+                <field id="networks" translate="label" type="multiselect" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Networks</label>
+                    <source_model>MageOS\Blog\Model\Config\Source\SocialNetwork</source_model>
+                </field>
+            </group>
+
+            <group id="rss" translate="label" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>RSS</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="limit" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Feed Item Limit</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
