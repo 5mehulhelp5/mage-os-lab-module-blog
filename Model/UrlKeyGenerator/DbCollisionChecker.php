@@ -7,7 +7,7 @@ namespace MageOS\Blog\Model\UrlKeyGenerator;
 use Magento\Framework\App\ResourceConnection;
 use MageOS\Blog\Api\UrlKeyGeneratorInterface;
 
-final class DbCollisionChecker implements CollisionChecker
+class DbCollisionChecker implements CollisionChecker
 {
     /**
      * @var array<string, array{table: string, id: string, urlKey: string, storeTable: ?string, storeFk: ?string}>

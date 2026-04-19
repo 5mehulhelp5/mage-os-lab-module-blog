@@ -6,7 +6,7 @@ namespace MageOS\Blog\Model\Category\Link;
 
 use MageOS\Blog\Model\Link\AbstractPivotLinkManager;
 
-final class StoreLinkManager extends AbstractPivotLinkManager
+class StoreLinkManager extends AbstractPivotLinkManager
 {
     protected function pivotTable(): string
     {

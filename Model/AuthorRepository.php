@@ -16,7 +16,7 @@ use MageOS\Blog\Api\Data\AuthorSearchResultsInterfaceFactory;
 use MageOS\Blog\Model\ResourceModel\Author as AuthorResource;
 use MageOS\Blog\Model\ResourceModel\Author\CollectionFactory as AuthorCollectionFactory;
 
-final class AuthorRepository implements AuthorRepositoryInterface
+class AuthorRepository implements AuthorRepositoryInterface
 {
     public function __construct(
         private readonly AuthorResource $resource,

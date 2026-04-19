@@ -17,7 +17,7 @@ use MageOS\Blog\Model\ResourceModel\Tag as TagResource;
 use MageOS\Blog\Model\ResourceModel\Tag\CollectionFactory as TagCollectionFactory;
 use MageOS\Blog\Model\Tag\Link\StoreLinkManager;
 
-final class TagRepository implements TagRepositoryInterface
+class TagRepository implements TagRepositoryInterface
 {
     public function __construct(
         private readonly TagResource $resource,

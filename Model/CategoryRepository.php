@@ -17,7 +17,7 @@ use MageOS\Blog\Model\Category\Link\StoreLinkManager;
 use MageOS\Blog\Model\ResourceModel\Category as CategoryResource;
 use MageOS\Blog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 
-final class CategoryRepository implements CategoryRepositoryInterface
+class CategoryRepository implements CategoryRepositoryInterface
 {
     public function __construct(
         private readonly CategoryResource $resource,

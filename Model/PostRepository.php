@@ -19,7 +19,7 @@ use MageOS\Blog\Model\Post\Link\TagLinkManager;
 use MageOS\Blog\Model\ResourceModel\Post as PostResource;
 use MageOS\Blog\Model\ResourceModel\Post\CollectionFactory as PostCollectionFactory;
 
-final class PostRepository implements PostRepositoryInterface
+class PostRepository implements PostRepositoryInterface
 {
     public function __construct(
         private readonly PostResource $resource,

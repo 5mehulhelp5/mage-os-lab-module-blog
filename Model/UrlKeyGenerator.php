@@ -7,7 +7,7 @@ namespace MageOS\Blog\Model;
 use MageOS\Blog\Api\UrlKeyGeneratorInterface;
 use MageOS\Blog\Model\UrlKeyGenerator\CollisionChecker;
 
-final class UrlKeyGenerator implements UrlKeyGeneratorInterface
+class UrlKeyGenerator implements UrlKeyGeneratorInterface
 {
     public function __construct(private readonly CollisionChecker $checker)
     {

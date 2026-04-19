@@ -6,7 +6,7 @@ namespace MageOS\Blog\Model\Post\Link;
 
 use MageOS\Blog\Model\Link\AbstractPivotLinkManager;
 
-final class TagLinkManager extends AbstractPivotLinkManager
+class TagLinkManager extends AbstractPivotLinkManager
 {
     protected function pivotTable(): string
     {
