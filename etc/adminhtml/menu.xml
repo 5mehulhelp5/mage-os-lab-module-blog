@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="MageOS_Blog::blog"
+             title="Blog"
+             module="MageOS_Blog"
+             parent="Magento_Backend::content"
+             sortOrder="50"
+             resource="MageOS_Blog::blog"/>
+        <add id="MageOS_Blog::post"
+             title="Posts"
+             module="MageOS_Blog"
+             parent="MageOS_Blog::blog"
+             sortOrder="10"
+             action="mageos_blog/post/index"
+             resource="MageOS_Blog::post"/>
+        <add id="MageOS_Blog::category"
+             title="Categories"
+             module="MageOS_Blog"
+             parent="MageOS_Blog::blog"
+             sortOrder="20"
+             action="mageos_blog/category/index"
+             resource="MageOS_Blog::category"/>
+        <add id="MageOS_Blog::tag"
+             title="Tags"
+             module="MageOS_Blog"
+             parent="MageOS_Blog::blog"
+             sortOrder="30"
+             action="mageos_blog/tag/index"
+             resource="MageOS_Blog::tag"/>
+        <add id="MageOS_Blog::author"
+             title="Authors"
+             module="MageOS_Blog"
+             parent="MageOS_Blog::blog"
+             sortOrder="40"
+             action="mageos_blog/author/index"
+             resource="MageOS_Blog::author"/>
+        <add id="MageOS_Blog::config"
+             title="Configuration"
+             module="MageOS_Blog"
+             parent="MageOS_Blog::blog"
+             sortOrder="50"
+             action="adminhtml/system_config/edit/section/mageos_blog"
+             resource="MageOS_Blog::config"/>
+    </menu>
+</config>
