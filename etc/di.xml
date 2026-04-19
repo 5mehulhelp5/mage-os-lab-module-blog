@@ -21,6 +21,8 @@
                 type="MageOS\Blog\Model\CategoryRepository"/>
     <preference for="MageOS\Blog\Api\PostRepositoryInterface"
                 type="MageOS\Blog\Model\PostRepository"/>
+    <preference for="MageOS\Blog\Api\TagRepositoryInterface"
+                type="MageOS\Blog\Model\TagRepository"/>
     <preference for="MageOS\Blog\Api\UrlKeyGeneratorInterface"
                 type="MageOS\Blog\Model\UrlKeyGenerator"/>
     <preference for="MageOS\Blog\Model\UrlKeyGenerator\CollisionChecker"
