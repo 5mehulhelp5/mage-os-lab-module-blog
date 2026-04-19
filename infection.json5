@@ -1,0 +1,14 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": ["Model", "ViewModel", "Cron"]
+    },
+    "mutators": { "@default": true },
+    "phpUnit": { "configDir": "." },
+    "minMsi": 75,
+    "minCoveredMsi": 80,
+    "logs": {
+        "text": "infection.log",
+        "github": true
+    }
+}
