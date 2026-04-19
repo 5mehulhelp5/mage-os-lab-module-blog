@@ -43,6 +43,11 @@
             </argument>
         </arguments>
     </type>
+    <type name="MageOS\Blog\Ui\DataProvider\Post\Form\DataProvider">
+        <arguments>
+            <argument name="imageUploader" xsi:type="object">MageOS\Blog\PostImageUpload</argument>
+        </arguments>
+    </type>
     <virtualType name="MageOS\Blog\PostImageUpload" type="MageOS\Blog\Model\ImageUploader">
         <arguments>
             <argument name="baseTmpPath" xsi:type="string">mageos_blog/tmp</argument>
