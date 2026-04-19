@@ -42,11 +42,18 @@
         "sort-packages": true,
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
-            "magento/composer-dependency-version-audit-plugin": true
+            "magento/composer-dependency-version-audit-plugin": true,
+            "infection/extension-installer": true
         }
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://mirror.mage-os.org/"
+        }
+    ],
     "scripts": {
         "test:unit":      "phpunit -c phpunit.xml.dist --testsuite unit",
         "test:phpstan":   "phpstan analyse --memory-limit=1G",
