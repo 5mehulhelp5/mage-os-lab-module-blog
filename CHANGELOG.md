@@ -22,6 +22,7 @@ First release of the greenfield rewrite. No migration path from pre-v1 forks.
 - **GraphQL.** Queries (`blogPost`, `blogPosts`, `blogCategory`, `blogCategories`, `blogTag`, `blogTags`, `blogAuthor`, `blogAuthors`). Mutations (`create` / `update` / `delete` for all four entities). URL resolver integration: `urlResolver(url:"/blog/my-post")` returns `type: BLOG_POST`. Mutations require admin token plus ACL.
 - **Hyvä support.** A `Plugin\Magento\Framework\View\TemplateEngine\Php` plugin injects a `HyvaThemeDetection` helper into every `.phtml` scope. `Plugin\Magento\Framework\View\Element\TemplateRewrite` remaps `MageOS_Blog::X` paths to `MageOS_Blog::hyva/X` on Hyvä themes.
 - **i18n.** Seed `i18n/en_US.csv` with 236 phrases.
+- **Quality gates.** PHPStan level 8, PHPCS (Magento2 ruleset), PHP-CS-Fixer, PHPUnit unit suite (57 tests), Infection mutation testing (baselines: MSI 54%, Covered MSI 70%).
 
 ### Notes on design
 
@@ -35,5 +36,6 @@ Design inspired by [Magefan Blog](https://magefan.com/magento2-blog-extension) (
 - PageBuilder content editing.
 - Hyvä-native `.phtml` set (detection plugin is in place; the companion package is empty until v1.1).
 - Configurable URL prefix, custom per-page CSS, preview-token model, Commerce-only AdminGWS plugin, MFTF tests, gravatar autofetch, per-post multi-language content variants.
+- Infection MSI ≥ 75% / Covered MSI ≥ 80%. v1.0 ships at 54% / 70% respectively; raising the floor depends on expanding unit-test coverage into `ViewModel/Post/Detail` (JSON-LD shape edge cases) and `Model/HyvaThemeDetection` (theme-chain walking).
 
 [1.0.0]: https://github.com/mage-os/module-blog/releases/tag/v1.0.0
