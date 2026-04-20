@@ -1,30 +1,35 @@
 <?php
+
 declare(strict_types=1);
+
 namespace MageOS\Blog\Controller\Index;
 
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\Controller\Result\Forward;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\View\Result\Page;
+use MageOS\Blog\Model\Config;
 
-/**
- * Blog home page view
- */
-class Index extends \MageOS\Blog\App\Action\Action
+class Index implements HttpGetActionInterface
 {
-    /**
-     * View blog homepage action
-     *
-     * @return \Magento\Framework\Controller\ResultInterface
-     */
-    public function execute()
+    public function __construct(
+        private readonly ResultFactory $resultFactory,
+        private readonly Config $config
+    ) {
+    }
+
+    public function execute(): ResultInterface
     {
-        if (!$this->moduleEnabled()) {
-            //return $this->_forwardNoroute();
-            return $this->_objectManager->get(ResultFactory::class)
-                ->create(ResultFactory::TYPE_FORWARD)
-                ->forward('noroute');
+        if (!$this->config->isEnabled()) {
+            /** @var Forward $forward */
+            $forward = $this->resultFactory->create(ResultFactory::TYPE_FORWARD);
+            return $forward->forward('noroute');
         }
 
-        $resultPage = $this->_objectManager->get(\MageOS\Blog\Helper\Page::class)
-            ->prepareResultPage($this, new \Magento\Framework\DataObject());
-        return $resultPage;
+        /** @var Page $page */
+        $page = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
+        $page->getConfig()->getTitle()->set((string) __('Blog'));
+        return $page;
     }
 }

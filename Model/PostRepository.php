@@ -1,85 +1,148 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\Blog\Model;
 
-use Magento\Framework\Api\SearchResultsFactory;
-use Magento\Framework\Api\SearchCriteriaInterface;
-use MageOS\Blog\Model\AbstractRepository;
-use MageOS\Blog\Api\PostRepositoryInterface;
-use MageOS\Blog\Model\ResourceModel\Post as PostResourceModel;
-use MageOS\Blog\Model\PostFactory;
-use MageOS\Blog\Api\Data\BlogPostInterface;
-use MageOS\Blog\Model\ResourceModel\Post\CollectionFactory;
-use Magento\Framework\Api\SearchResultsInterfaceFactory;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
-use Magento\Framework\Api\SearchResultsInterface;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use MageOS\Blog\Api\Data\PostInterface;
+use MageOS\Blog\Api\Data\PostSearchResultsInterface;
+use MageOS\Blog\Api\Data\PostSearchResultsInterfaceFactory;
+use MageOS\Blog\Api\PostRepositoryInterface;
+use MageOS\Blog\Api\UrlKeyGeneratorInterface;
+use MageOS\Blog\Model\Post\Link\CategoryLinkManager;
+use MageOS\Blog\Model\Post\Link\StoreLinkManager;
+use MageOS\Blog\Model\Post\Link\TagLinkManager;
+use MageOS\Blog\Model\ResourceModel\Post as PostResource;
+use MageOS\Blog\Model\ResourceModel\Post\CollectionFactory as PostCollectionFactory;
 
-class PostRepository extends AbstractRepository implements PostRepositoryInterface
+class PostRepository implements PostRepositoryInterface
 {
-    private PostFactory $postFactory;
     public function __construct(
-        PostResourceModel $resource,
-        PostFactory $postFactory,
-        CollectionFactory $postCollectionFactory,
-        SearchResultsInterfaceFactory $searchResultsFactory,
-        CollectionProcessorInterface $collectionProcessor
+        private readonly PostResource $resource,
+        private readonly PostFactory $postFactory,
+        private readonly PostCollectionFactory $collectionFactory,
+        private readonly PostSearchResultsInterfaceFactory $searchResultsFactory,
+        private readonly CollectionProcessorInterface $collectionProcessor,
+        private readonly StoreLinkManager $storeLinks,
+        private readonly CategoryLinkManager $categoryLinks,
+        private readonly TagLinkManager $tagLinks,
+        private readonly UrlKeyGeneratorInterface $urlKeyGenerator,
     ) {
-        parent::__construct(
-            $resource,
-            $postFactory,
-            $postCollectionFactory,
-            $searchResultsFactory,
-            $collectionProcessor
-        );
-        $this->postFactory = $postFactory;
     }
 
-    /**
-     * @return PostFactory
-     */
-    public function getFactory(): PostFactory
+    public function save(PostInterface $post): PostInterface
     {
-        return $this->postFactory;
+        if (!$post instanceof Post) {
+            throw new CouldNotSaveException(__('Unsupported post entity: %1', $post::class));
+        }
+
+        try {
+            $this->urlKeyGenerator->validate(
+                (string) $post->getUrlKey(),
+                UrlKeyGeneratorInterface::ENTITY_POST,
+                null,
+                $post->getPostId() !== null ? (int) $post->getPostId() : null
+            );
+        } catch (\InvalidArgumentException $e) {
+            throw new LocalizedException(__($e->getMessage()), $e);
+        }
+
+        try {
+            $this->resource->save($post);
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(__('Could not save the blog post: %1', $e->getMessage()), $e);
+        }
+
+        $postId = (int) $post->getPostId();
+        $this->storeLinks->sync($postId, $post->getStoreIds());
+        $this->categoryLinks->sync($postId, $post->getCategoryIds());
+        $this->tagLinks->sync($postId, $post->getTagIds());
+
+        return $this->getById($postId);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function save(Post $post): mixed
+    public function getById(int $id): PostInterface
     {
-        return $this->genericSave($post);
+        $post = $this->postFactory->create();
+        $this->resource->load($post, $id);
+        if (!$post->getPostId()) {
+            throw NoSuchEntityException::singleField('postId', $id);
+        }
+        $this->hydrateLinks($post);
+
+        return $post;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getById($postId, $editMode = false, $storeId = null, $forceReload = false): mixed
+    public function getByUrlKey(string $urlKey, int $storeId): PostInterface
     {
-       return $this->genericGet($postId);
+        $collection = $this->collectionFactory->create();
+        $collection->addFieldToFilter(PostInterface::URL_KEY, $urlKey);
+        $collection->getSelect()
+            ->join(
+                ['s' => $this->resource->getTable('mageos_blog_post_store')],
+                's.post_id = main_table.post_id',
+                []
+            )
+            ->where('s.store_id IN (?)', [$storeId, 0])
+            ->group('main_table.post_id');
+
+        $post = $collection->getFirstItem();
+        if (!$post->getPostId()) {
+            throw NoSuchEntityException::doubleField('urlKey', $urlKey, 'storeId', $storeId);
+        }
+        if (!$post instanceof Post) {
+            throw new \LogicException('Collection returned unexpected entity class.');
+        }
+        $this->hydrateLinks($post);
+
+        return $post;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function delete(Post $post): bool
+    public function getList(SearchCriteriaInterface $criteria): PostSearchResultsInterface
     {
-        return $this->genericDelete($post);
+        $collection = $this->collectionFactory->create();
+        $this->collectionProcessor->process($criteria, $collection);
+
+        $results = $this->searchResultsFactory->create();
+        $results->setSearchCriteria($criteria);
+        /** @var PostInterface[] $items */
+        $items = $collection->getItems();
+        $results->setItems($items);
+        $results->setTotalCount($collection->getSize());
+
+        return $results;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteById(int $postId): bool
+    public function delete(PostInterface $post): bool
     {
-        return $this->genericDeleteById((string)$postId);
+        if (!$post instanceof Post) {
+            throw new CouldNotDeleteException(__('Unsupported post entity: %1', $post::class));
+        }
+        try {
+            $this->resource->delete($post);
+        } catch (\Exception $e) {
+            throw new CouldNotDeleteException(__('Could not delete the blog post: %1', $e->getMessage()), $e);
+        }
+
+        return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getList(SearchCriteriaInterface $searchCriteria): SearchResultsInterface
+    public function deleteById(int $id): bool
     {
-        return $this->genericGetList($searchCriteria);
+        return $this->delete($this->getById($id));
+    }
+
+    private function hydrateLinks(PostInterface $post): void
+    {
+        $id = (int) $post->getPostId();
+        $post->setStoreIds($this->storeLinks->getLinkedIds($id));
+        $post->setCategoryIds($this->categoryLinks->getLinkedIds($id));
+        $post->setTagIds($this->tagLinks->getLinkedIds($id));
     }
 }

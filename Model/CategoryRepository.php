@@ -1,95 +1,140 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\Blog\Model;
 
-use MageOS\Blog\Model\AbstractRepository;
-use MageOS\Blog\Api\CategoryRepositoryInterface;
-use MageOS\Blog\Model\ResourceModel\Category as CategoryResourceModel;
-use MageOS\Blog\Model\ResourceModel\Category\CollectionFactory;
-use Magento\Framework\Api\SearchResultsFactory;
-use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use MageOS\Blog\Api\CategoryRepositoryInterface;
+use MageOS\Blog\Api\Data\CategoryInterface;
+use MageOS\Blog\Api\Data\CategorySearchResultsInterface;
+use MageOS\Blog\Api\Data\CategorySearchResultsInterfaceFactory;
+use MageOS\Blog\Api\UrlKeyGeneratorInterface;
+use MageOS\Blog\Model\Category\Link\StoreLinkManager;
+use MageOS\Blog\Model\ResourceModel\Category as CategoryResource;
+use MageOS\Blog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 
-/**
- * Class CategoryRepository model
- */
-class CategoryRepository extends AbstractRepository implements CategoryRepositoryInterface
+class CategoryRepository implements CategoryRepositoryInterface
 {
-    private CategoryFactory $categoryFactory;
-    private array $instances;
-
     public function __construct(
-        CategoryFactory $categoryFactory,
-        CategoryResourceModel $categoryResourceModel,
-        CollectionFactory $collectionFactory,
-        SearchResultsFactory $searchResultsFactory,
-        CollectionProcessorInterface $collectionProcessor = null
+        private readonly CategoryResource $resource,
+        private readonly CategoryFactory $categoryFactory,
+        private readonly CategoryCollectionFactory $collectionFactory,
+        private readonly CategorySearchResultsInterfaceFactory $searchResultsFactory,
+        private readonly CollectionProcessorInterface $collectionProcessor,
+        private readonly StoreLinkManager $storeLinks,
+        private readonly UrlKeyGeneratorInterface $urlKeyGenerator,
     ) {
-        parent::__construct(
-            $categoryResourceModel,
-            $categoryFactory,
-            $collectionFactory,
-            $searchResultsFactory,
-            $collectionProcessor
-        );
-        $this->categoryFactory = $categoryFactory;
     }
 
-    /**
-     * @return CategoryFactory
-     */
-    public function getFactory(): CategoryFactory
+    public function save(CategoryInterface $category): CategoryInterface
     {
-        return $this->categoryFactory;
-    }
-
-    /**
-     * {@inheritdoc}
-     * @throws CouldNotSaveException
-     */
-    public function save(Category $category)
-    {
-        return $this->genericSave($category);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getById($categoryId, $editMode = false, $storeId = null, $forceReload = false)
-    {
-        $cacheKey = implode('_', func_get_args());
-        if (!isset($this->instances[$cacheKey])) {
-            $category = $this->genericGet($categoryId);
-            $this->instances[$cacheKey] = $category;
+        if (!$category instanceof Category) {
+            throw new CouldNotSaveException(__('Unsupported category entity: %1', $category::class));
         }
-        return $this->instances[$cacheKey];
+
+        try {
+            $this->urlKeyGenerator->validate(
+                (string) $category->getUrlKey(),
+                UrlKeyGeneratorInterface::ENTITY_CATEGORY,
+                null,
+                $category->getCategoryId() !== null ? (int) $category->getCategoryId() : null
+            );
+        } catch (\InvalidArgumentException $e) {
+            throw new LocalizedException(__($e->getMessage()), $e);
+        }
+
+        try {
+            $this->resource->save($category);
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(__('Could not save the blog category: %1', $e->getMessage()), $e);
+        }
+
+        $categoryId = (int) $category->getCategoryId();
+        $this->storeLinks->sync($categoryId, $category->getStoreIds());
+
+        return $this->getById($categoryId);
     }
 
-    /**
-     * {@inheritdoc}
-     * @throws CouldNotDeleteException
-     */
-    public function delete(Category $category)
+    public function getById(int $id): CategoryInterface
     {
-       return $this->genericDelete($category);
+        $category = $this->categoryFactory->create();
+        $this->resource->load($category, $id);
+        if (!$category->getCategoryId()) {
+            throw NoSuchEntityException::singleField('categoryId', $id);
+        }
+        $this->hydrateLinks($category);
+
+        return $category;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteById($categoryId): bool
+    public function getByUrlKey(string $urlKey, int $storeId): CategoryInterface
     {
-        return $this->genericDeleteById((string)$categoryId);
+        $collection = $this->collectionFactory->create();
+        $collection->addFieldToFilter(CategoryInterface::URL_KEY, $urlKey);
+        $collection->getSelect()
+            ->join(
+                ['s' => $this->resource->getTable('mageos_blog_category_store')],
+                's.category_id = main_table.category_id',
+                []
+            )
+            ->where('s.store_id IN (?)', [$storeId, 0])
+            ->group('main_table.category_id');
+
+        $category = $collection->getFirstItem();
+        if (!$category->getCategoryId()) {
+            throw NoSuchEntityException::doubleField('urlKey', $urlKey, 'storeId', $storeId);
+        }
+        if (!$category instanceof Category) {
+            throw new \LogicException('Collection returned unexpected entity class.');
+        }
+        $this->hydrateLinks($category);
+
+        return $category;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getList(SearchCriteriaInterface $searchCriteria)
+    public function getList(SearchCriteriaInterface $criteria): CategorySearchResultsInterface
     {
-       return $this->genericGetList($searchCriteria);
+        $collection = $this->collectionFactory->create();
+        $this->collectionProcessor->process($criteria, $collection);
+
+        $results = $this->searchResultsFactory->create();
+        $results->setSearchCriteria($criteria);
+        /** @var CategoryInterface[] $items */
+        $items = $collection->getItems();
+        $results->setItems($items);
+        $results->setTotalCount($collection->getSize());
+
+        return $results;
+    }
+
+    public function delete(CategoryInterface $category): bool
+    {
+        if (!$category instanceof Category) {
+            throw new CouldNotDeleteException(__('Unsupported category entity: %1', $category::class));
+        }
+        try {
+            $this->resource->delete($category);
+        } catch (\Exception $e) {
+            throw new CouldNotDeleteException(__('Could not delete the blog category: %1', $e->getMessage()), $e);
+        }
+
+        return true;
+    }
+
+    public function deleteById(int $id): bool
+    {
+        return $this->delete($this->getById($id));
+    }
+
+    private function hydrateLinks(CategoryInterface $category): void
+    {
+        $id = (int) $category->getCategoryId();
+        $category->setStoreIds($this->storeLinks->getLinkedIds($id));
     }
 }

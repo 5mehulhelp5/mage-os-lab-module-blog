@@ -1,0 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+/** @var \MageOS\Blog\Block\Widget\TagLink $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$tag = $block->getTag();
+?>
+<?php if ($tag !== null): ?>
+    <a class="mageos-blog-widget mageos-blog-widget--tag-link"
+       href="<?= $escaper->escapeUrl($block->getTagUrl($tag)); ?>">
+        <?= $escaper->escapeHtml($block->getLabel($tag)); ?>
+    </a>
+<?php endif; ?>

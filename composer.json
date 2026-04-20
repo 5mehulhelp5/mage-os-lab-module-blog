@@ -1,19 +1,66 @@
 {
     "name": "mageos/module-blog",
-    "description": "Blog functionality",
+    "description": "Blog module for Mage-OS / Magento 2 — posts, categories, tags, authors, SEO, GraphQL.",
     "type": "magento2-module",
-    "version": "1.0.0",
-    "minimum-stability": "dev",
+    "license": "OSL-3.0",
     "require": {
-        "magento/framework": "*"
+        "php": "^8.2",
+        "magento/framework": "^103.0.7",
+        "magento/module-backend": "*",
+        "magento/module-catalog": "*",
+        "magento/module-cms": "*",
+        "magento/module-customer": "*",
+        "magento/module-graph-ql": "*",
+        "magento/module-media-storage": "*",
+        "magento/module-search": "*",
+        "magento/module-sitemap": "*",
+        "magento/module-store": "*",
+        "magento/module-ui": "*",
+        "magento/module-url-rewrite": "*",
+        "magento/module-url-rewrite-graph-ql": "*",
+        "magento/module-widget": "*"
     },
-    "suggest": {
-        "mageos/module-blog-hyva": "Provides Hyvä compatibility for MageOS_Blog."
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "phpstan/phpstan": "^2.0",
+        "bitexpert/phpstan-magento": "^0.42",
+        "friendsofphp/php-cs-fixer": "^3.50",
+        "magento/magento-coding-standard": "^40",
+        "infection/infection": "^0.29"
     },
     "autoload": {
-        "files": [ "registration.php" ],
+        "files": ["registration.php"],
         "psr-4": {
             "MageOS\\Blog\\": ""
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MageOS\\Blog\\Test\\": "Test/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "magento/composer-dependency-version-audit-plugin": true,
+            "infection/extension-installer": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://mirror.mage-os.org/"
+        }
+    ],
+    "scripts": {
+        "test:unit":      "phpunit -c phpunit.xml.dist --testsuite unit",
+        "test:phpstan":   "phpstan analyse --memory-limit=1G",
+        "test:cs-fixer":  "php-cs-fixer fix --dry-run --diff",
+        "test:phpcs":     "phpcs --standard=phpcs.xml.dist",
+        "test:infection": "infection --min-msi=75 --threads=4",
+        "test":           ["@test:unit", "@test:phpstan", "@test:cs-fixer", "@test:phpcs"]
     }
 }

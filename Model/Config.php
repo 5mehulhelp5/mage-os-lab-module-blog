@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\Blog\Model;
@@ -6,389 +7,138 @@ namespace MageOS\Blog\Model;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
-/**
- * MageOS Blog Config Model
- */
 class Config
 {
-    /**
-     * MODULE SYSTEM KEY
-     */
-    CONST string MODULE_SYS_KEY = "mageos_blog";
+    public const XML_PATH_ENABLED = 'mageos_blog/general/enabled';
 
-    /**
-     * SYSTEM CONFIGURATION SECTIONS
-     */
-    CONST string SYS_GENERAL   = "general";
-    CONST string SYS_POST      = "post";
-    CONST string SYS_SIDEBAR   = "sidebar";
-    CONST string SYS_INDEX     = "index_page";
-    CONST string SYS_LIST      = "post_list";
-    CONST string SYS_TAG       = "tag";
-    CONST string SYS_DESIGN    = "design";
-    CONST string SYS_SEARCH    = "search";
-    CONST string SYS_PRODUCT   = "product_page";
-    CONST string SYS_PERMALINK = "permalink";
-    CONST string SYS_SEO       = "seo";
-    CONST string SYS_SITEMAP   = "sitemap";
-    CONST string SYS_SOCIAL    = "social";
-    CONST string SYS_MENU      = "top_menu";
-    CONST string SYS_DEV       = "developer";
+    public const XML_PATH_POSTS_PER_PAGE = 'mageos_blog/post/posts_per_page';
+    public const XML_PATH_DEFAULT_ROBOTS = 'mageos_blog/post/default_robots';
 
-    /**
-     * SYSTEM CONFIGURATION GENERAL FIELDS
-     */
-    CONST string XML_PATH_ENABLED = self::MODULE_SYS_KEY.'/'.self::SYS_GENERAL.'/'. "enabled";
+    public const XML_PATH_SIDEBAR_SEARCH_ENABLED = 'mageos_blog/sidebar/search_enabled';
+    public const XML_PATH_SIDEBAR_SEARCH_SORT_ORDER = 'mageos_blog/sidebar/search_sort_order';
+    public const XML_PATH_SIDEBAR_RECENT_POSTS_ENABLED = 'mageos_blog/sidebar/recent_posts_enabled';
+    public const XML_PATH_SIDEBAR_RECENT_POSTS_SORT_ORDER = 'mageos_blog/sidebar/recent_posts_sort_order';
+    public const XML_PATH_SIDEBAR_RECENT_POSTS_COUNT = 'mageos_blog/sidebar/recent_posts_count';
+    public const XML_PATH_SIDEBAR_CATEGORY_LIST_ENABLED = 'mageos_blog/sidebar/category_list_enabled';
+    public const XML_PATH_SIDEBAR_CATEGORY_LIST_SORT_ORDER = 'mageos_blog/sidebar/category_list_sort_order';
+    public const XML_PATH_SIDEBAR_TAG_CLOUD_ENABLED = 'mageos_blog/sidebar/tag_cloud_enabled';
+    public const XML_PATH_SIDEBAR_TAG_CLOUD_SORT_ORDER = 'mageos_blog/sidebar/tag_cloud_sort_order';
+    public const XML_PATH_SIDEBAR_ARCHIVE_ENABLED = 'mageos_blog/sidebar/archive_enabled';
+    public const XML_PATH_SIDEBAR_ARCHIVE_SORT_ORDER = 'mageos_blog/sidebar/archive_sort_order';
 
-    /**
-     * SYSTEM CONFIGURATION POST FIELDS
-     */
-    CONST string XML_PATH_POST_LAYOUT = self::MODULE_SYS_KEY.'/'.self::SYS_POST.'/'. "layout";
-    CONST string XML_PATH_POST_VIEW_COUNT = self::MODULE_SYS_KEY.'/'.self::SYS_POST.'/'. "view_counts";
-    CONST string XML_PATH_POST_READING_TIME = self::MODULE_SYS_KEY.'/'.self::SYS_POST.'/'. "reading_time";
-    CONST string XML_PATH_POST_NEXTPREV = self::MODULE_SYS_KEY.'/'.self::SYS_POST.'/'. "nextprev";
-    CONST string XML_PATH_POST_RELATED_CATEGORY = self::MODULE_SYS_KEY.'/'.self::SYS_POST.'/'. "related_category";
-    CONST string XML_PATH_POST_RELATED_POSTS = self::MODULE_SYS_KEY.'/'.self::SYS_POST.'/'. "related_posts";
-    CONST string XML_PATH_POST_RELATED_PRODUCTS = self::MODULE_SYS_KEY.'/'.self::SYS_POST.'/'. "related_products";
-    // POST COMMENTS SUBGROUP
-    CONST string XML_PATH_COMMENTS_GUEST_COMMENTS = self::MODULE_SYS_KEY.'/'.self::SYS_POST.'/comments/'. "guest_comments";
-    CONST string XML_PATH_COMMENTS_DEFAULT_STATUS = self::MODULE_SYS_KEY.'/'.self::SYS_POST.'/comments/'. "default_status";
-    CONST string XML_PATH_COMMENTS_FORMAT_DATE = self::MODULE_SYS_KEY.'/'.self::SYS_POST.'/comments/'. "format_date";
+    public const XML_PATH_SEO_OG_DEFAULT_TYPE = 'mageos_blog/seo/og_default_type';
+    public const XML_PATH_SEO_JSON_LD_ENABLED = 'mageos_blog/seo/json_ld_enabled';
+    public const XML_PATH_SEO_TWITTER_SITE = 'mageos_blog/seo/twitter_site';
 
-    /**
-     * SYSTEM CONFIGURATION SIDEBAR FIELDS
-     */
-    CONST string XML_PATH_SIDEBAR_SEARCH_ENABLED = self::MODULE_SYS_KEY.'/'.self::SYS_SIDEBAR.'/search/'. "enabled";
-    CONST string XML_PATH_SIDEBAR_SEARCH_SORT_ORDER = self::MODULE_SYS_KEY.'/'.self::SYS_SIDEBAR.'/search/'. "sort_order";
+    public const XML_PATH_SITEMAP_POST_ENABLED = 'mageos_blog/sitemap/post/enabled';
+    public const XML_PATH_SITEMAP_POST_FREQUENCY = 'mageos_blog/sitemap/post/frequency';
+    public const XML_PATH_SITEMAP_POST_PRIORITY = 'mageos_blog/sitemap/post/priority';
+    public const XML_PATH_SITEMAP_CATEGORY_ENABLED = 'mageos_blog/sitemap/category/enabled';
+    public const XML_PATH_SITEMAP_CATEGORY_FREQUENCY = 'mageos_blog/sitemap/category/frequency';
+    public const XML_PATH_SITEMAP_CATEGORY_PRIORITY = 'mageos_blog/sitemap/category/priority';
+    public const XML_PATH_SITEMAP_TAG_ENABLED = 'mageos_blog/sitemap/tag/enabled';
+    public const XML_PATH_SITEMAP_TAG_FREQUENCY = 'mageos_blog/sitemap/tag/frequency';
+    public const XML_PATH_SITEMAP_TAG_PRIORITY = 'mageos_blog/sitemap/tag/priority';
 
-    CONST string XML_PATH_SIDEBAR_CONTENTS_ENABLED = self::MODULE_SYS_KEY.'/'.self::SYS_SIDEBAR.'/contents/'. "enabled";
-    CONST string XML_PATH_SIDEBAR_CONTENTS_SORT_ORDER = self::MODULE_SYS_KEY.'/'.self::SYS_SIDEBAR.'/contents/'. "sort_order";
+    public const XML_PATH_SOCIAL_NETWORKS = 'mageos_blog/social/networks';
 
-    CONST string XML_PATH_SIDEBAR_CATEGORIES_ENABLED = self::MODULE_SYS_KEY.'/'.self::SYS_SIDEBAR.'/categories/'. "enabled";
-    CONST string XML_PATH_SIDEBAR_CATEGORIES_SORT_ORDER = self::MODULE_SYS_KEY.'/'.self::SYS_SIDEBAR.'/categories/'. "sort_order";
+    public const XML_PATH_RSS_ENABLED = 'mageos_blog/rss/enabled';
+    public const XML_PATH_RSS_LIMIT = 'mageos_blog/rss/limit';
 
-    CONST string XML_PATH_SIDEBAR_RECENT_POSTS_ENABLED = self::MODULE_SYS_KEY.'/'.self::SYS_SIDEBAR.'/recent_posts/'. "enabled";
-    CONST string XML_PATH_SIDEBAR_RECENT_POSTS_SORT_ORDER = self::MODULE_SYS_KEY.'/'.self::SYS_SIDEBAR.'/recent_posts/'. "sort_order";
+    public function __construct(private readonly ScopeConfigInterface $scopeConfig)
+    {
+    }
 
-    CONST string XML_PATH_SIDEBAR_POPULAR_POSTS_ENABLED = self::MODULE_SYS_KEY.'/'.self::SYS_SIDEBAR.'/popular_posts/'. "enabled";
-    CONST string XML_PATH_SIDEBAR_POPULAR_POSTS_SORT_ORDER = self::MODULE_SYS_KEY.'/'.self::SYS_SIDEBAR.'/popular_posts/'. "sort_order";
+    public function isEnabled(?int $storeId = null): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_ENABLED, ScopeInterface::SCOPE_STORE, $storeId);
+    }
 
-    CONST string XML_PATH_SIDEBAR_POST_RELATED_PRODUCTS_ENABLED = self::MODULE_SYS_KEY.'/'.self::SYS_SIDEBAR.'/post_related_products/'. "enabled";
-    CONST string XML_PATH_SIDEBAR_POST_RELATED_PRODUCTS_SORT_ORDER = self::MODULE_SYS_KEY.'/'.self::SYS_SIDEBAR.'/post_related_products/'. "sort_order";
+    public function getPostsPerPage(?int $storeId = null): int
+    {
+        return (int) $this->scopeConfig->getValue(self::XML_PATH_POSTS_PER_PAGE, ScopeInterface::SCOPE_STORE, $storeId);
+    }
 
-    /**
-     * SYSTEM CONFIGURATION INDEX PAGE FIELDS
-     */
-    CONST string XML_PATH_INDEX_PAGE_TITLE = self::MODULE_SYS_KEY.'/'.self::SYS_INDEX.'/'. "title";
-    CONST string XML_PATH_INDEX_PAGE_LAYOUT = self::MODULE_SYS_KEY.'/'.self::SYS_INDEX.'/'. "index_page_layout";
-    CONST string XML_PATH_INDEX_PAGE_DISPLAY_MODE = self::MODULE_SYS_KEY.'/'.self::SYS_INDEX.'/'. "display_mode";
-    CONST string XML_PATH_INDEX_PAGE_POST_IDS = self::MODULE_SYS_KEY.'/'.self::SYS_INDEX.'/'. "post_ids";
-    CONST string XML_PATH_INDEX_PAGE_POSTS_SORT_BY = self::MODULE_SYS_KEY.'/'.self::SYS_INDEX.'/'. "posts_sort_by";
-    CONST string XML_PATH_INDEX_PAGE_META_TITLE = self::MODULE_SYS_KEY.'/'.self::SYS_INDEX.'/'. "meta_title";
-    CONST string XML_PATH_INDEX_PAGE_META_KEYWORDS = self::MODULE_SYS_KEY.'/'.self::SYS_INDEX.'/'. "meta_keywords";
-    CONST string XML_PATH_INDEX_PAGE_META_DESCRIPTION = self::MODULE_SYS_KEY.'/'.self::SYS_INDEX.'/'. "meta_description";
+    public function getDefaultRobots(?int $storeId = null): string
+    {
+        return (string) $this->scopeConfig->getValue(self::XML_PATH_DEFAULT_ROBOTS, ScopeInterface::SCOPE_STORE, $storeId);
+    }
 
-    /**
-     * SYSTEM CONFIGURATION POST LIST FIELDS
-     */
-    CONST string XML_PATH_LIST_POSTS_PER_PAGE = self::MODULE_SYS_KEY.'/'.self::SYS_LIST.'/'. "posts_per_page";
-    CONST string XML_PATH_LIST_SHORTCONTENT_LENGTH = self::MODULE_SYS_KEY.'/'.self::SYS_LIST.'/'. "shortcotent_length";
+    public function isSidebarWidgetEnabled(string $widget, ?int $storeId = null): bool
+    {
+        $path = 'mageos_blog/sidebar/' . $widget . '_enabled';
 
-    /**
-     * SYSTEM CONFIGURATION TAG FIELDS
-     */
-    CONST string XML_PATH_TAG_ROBOTS = self::MODULE_SYS_KEY.'/'.self::SYS_TAG.'/'. "robots";
-    CONST string XML_PATH_TAG_PAGE_LAYOUT = self::MODULE_SYS_KEY.'/'.self::SYS_TAG.'/'. "tag_page_layout";
+        return $this->scopeConfig->isSetFlag($path, ScopeInterface::SCOPE_STORE, $storeId);
+    }
 
-    /**
-     * SYSTEM CONFIGURATION DESIGN FIELDS
-     */
-    CONST string XML_PATH_DESIGN_CATEGORY_PAGE_LAYOUT = self::MODULE_SYS_KEY.'/'.self::SYS_DESIGN.'/'. "category_page_layout";
-    CONST string XML_PATH_DESIGN_PUBLICATION_DATE = self::MODULE_SYS_KEY.'/'.self::SYS_DESIGN.'/'. "publication_date";
-    CONST string XML_PATH_DESIGN_FORMAT_DATE = self::MODULE_SYS_KEY.'/'.self::SYS_DESIGN.'/'. "format_date";
+    public function getSidebarWidgetSortOrder(string $widget, ?int $storeId = null): int
+    {
+        $path = 'mageos_blog/sidebar/' . $widget . '_sort_order';
 
+        return (int) $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE, $storeId);
+    }
 
-    /**
-     * SYSTEM CONFIGURATION SEARCH FIELDS
-     */
-    CONST string XML_PATH_SEARCH_ROBOTS = self::MODULE_SYS_KEY.'/'.self::SYS_SEARCH.'/'. "robots";
-    CONST string XML_PATH_SEARCH_PAGE_LAYOUT = self::MODULE_SYS_KEY.'/'.self::SYS_SEARCH.'/'. "search_page_layout";
-    CONST string XML_PATH_SEARCH_ENABLE = self::MODULE_SYS_KEY . '/' . self::SYS_SEARCH . '/enable_blog_search';
+    public function getRecentPostsCount(?int $storeId = null): int
+    {
+        return (int) $this->scopeConfig->getValue(self::XML_PATH_SIDEBAR_RECENT_POSTS_COUNT, ScopeInterface::SCOPE_STORE, $storeId);
+    }
 
-    /**
-     * SYSTEM CONFIGURATION PRODUCT PAGE FIELDS
-     */
-    CONST string XML_PATH_PRODUCT_PAGE_RELATED_POSTS_ENABLED = self::MODULE_SYS_KEY.'/'.self::SYS_PRODUCT.'/'. "related_posts_enabled";
-    CONST string XML_PATH_PRODUCT_PAGE_NUMBER_OF_RELATED_POSTS = self::MODULE_SYS_KEY.'/'.self::SYS_PRODUCT.'/'. "number_of_related_posts";
+    public function getOgDefaultType(?int $storeId = null): string
+    {
+        return (string) $this->scopeConfig->getValue(self::XML_PATH_SEO_OG_DEFAULT_TYPE, ScopeInterface::SCOPE_STORE, $storeId);
+    }
 
-    /**
-     * SYSTEM CONFIGURATION PERMALINK FIELDS
-     */
-    CONST string XML_PATH_PERMALINK_ROUTE = self::MODULE_SYS_KEY.'/'.self::SYS_PERMALINK.'/'. "route";
-    CONST string XML_PATH_PERMALINK_REDIRECT_TO_NO_SLASH = self::MODULE_SYS_KEY.'/'.self::SYS_PERMALINK.'/'. "redirect_to_no_slash";
-    CONST string XML_PATH_PERMALINK_TYPE = self::MODULE_SYS_KEY.'/'.self::SYS_PERMALINK.'/'. "type";
-    CONST string XML_PATH_PERMALINK_POST_ROUTE = self::MODULE_SYS_KEY.'/'.self::SYS_PERMALINK.'/'. "post_route";
-    CONST string XML_PATH_PERMALINK_POST_SUFIX = self::MODULE_SYS_KEY.'/'.self::SYS_PERMALINK.'/'. "post_sufix";
-    CONST string XML_PATH_PERMALINK_POST_USE_CATEGORIES = self::MODULE_SYS_KEY.'/'.self::SYS_PERMALINK.'/'. "post_use_categories";
-    CONST string XML_PATH_PERMALINK_CATEGORY_ROUTE = self::MODULE_SYS_KEY.'/'.self::SYS_PERMALINK.'/'. "category_route";
-    CONST string XML_PATH_PERMALINK_CATEGORY_FUFIX = self::MODULE_SYS_KEY.'/'.self::SYS_PERMALINK.'/'. "category_sufix";
-    CONST string XML_PATH_PERMALINK_CATEGORY_USE_CATEGORIES = self::MODULE_SYS_KEY.'/'.self::SYS_PERMALINK.'/'. "category_use_categories";
-    CONST string XML_PATH_PERMALINK_TAG_ROUTE = self::MODULE_SYS_KEY.'/'.self::SYS_PERMALINK.'/'. "tag_route";
-    CONST string XML_PATH_PERMALINK_TAG_SUFIX = self::MODULE_SYS_KEY.'/'.self::SYS_PERMALINK.'/'. "tag_sufix";
-    CONST string XML_PATH_PERMALINK_SEARCH_ROUTE = self::MODULE_SYS_KEY.'/'.self::SYS_PERMALINK.'/'. "search_route";
+    public function isJsonLdEnabled(?int $storeId = null): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_SEO_JSON_LD_ENABLED, ScopeInterface::SCOPE_STORE, $storeId);
+    }
 
+    public function getTwitterSite(?int $storeId = null): string
+    {
+        return (string) $this->scopeConfig->getValue(self::XML_PATH_SEO_TWITTER_SITE, ScopeInterface::SCOPE_STORE, $storeId);
+    }
 
-    /**
-     * SYSTEM CONFIGURATION SEO FIELDS
-     */
-    CONST string XML_PATH_SEO_USE_CANONICAL_META_TAG_FOR = self::MODULE_SYS_KEY.'/'.self::SYS_SEO.'/'. "use_canonical_meta_tag_for";
+    public function isSitemapEntityEnabled(string $entity, ?int $storeId = null): bool
+    {
+        $path = 'mageos_blog/sitemap/' . $entity . '/enabled';
 
-    /**
-     * SYSTEM CONFIGURATION SITEMAP FIELDS
-     */
-    CONST string XML_PATH_SITEMAP_INDEX_ENABLE  = self::MODULE_SYS_KEY.'/'.self::SYS_SITEMAP.'/index/'. "enabled";
-    CONST string XML_PATH_SITEMAP_CATEGORY_ENABLE  = self::MODULE_SYS_KEY.'/'.self::SYS_SITEMAP.'/category/'. "enabled";
-    CONST string XML_PATH_SITEMAP_POST_ENABLE  = self::MODULE_SYS_KEY.'/'.self::SYS_SITEMAP.'/post/'. "enabled";
-    CONST string XML_PATH_SITEMAP_TAG_ENABLE  = self::MODULE_SYS_KEY.'/'.self::SYS_SITEMAP.'/tag/'. "enabled";
+        return $this->scopeConfig->isSetFlag($path, ScopeInterface::SCOPE_STORE, $storeId);
+    }
 
-    CONST string XML_PATH_SITEMAP_INDEX_FREQUENCY = self::MODULE_SYS_KEY.'/'.self::SYS_SITEMAP.'/index/'. "frequency";
-    CONST string XML_PATH_SITEMAP_CATEGORY_FREQUENCY = self::MODULE_SYS_KEY.'/'.self::SYS_SITEMAP.'/category/'. "frequency";
-    CONST string XML_PATH_SITEMAP_POST_FREQUENCY = self::MODULE_SYS_KEY.'/'.self::SYS_SITEMAP.'/post/'. "frequency";
-    CONST string XML_PATH_SITEMAP_TAG_FREQUENCY = self::MODULE_SYS_KEY.'/'.self::SYS_SITEMAP.'/tag/'. "frequency";
+    public function getSitemapEntityFrequency(string $entity, ?int $storeId = null): string
+    {
+        $path = 'mageos_blog/sitemap/' . $entity . '/frequency';
 
-    CONST string XML_PATH_SITEMAP_INDEX_PRIORITY = self::MODULE_SYS_KEY.'/'.self::SYS_SITEMAP.'/index/'. "priority";
-    CONST string XML_PATH_SITEMAP_CATEGORY_PRIORITY = self::MODULE_SYS_KEY.'/'.self::SYS_SITEMAP.'/category/'. "priority";
-    CONST string XML_PATH_SITEMAP_POST_PRIORITY = self::MODULE_SYS_KEY.'/'.self::SYS_SITEMAP.'/post/'. "priority";
-    CONST string XML_PATH_SITEMAP_TAG_PRIORITY = self::MODULE_SYS_KEY.'/'.self::SYS_SITEMAP.'/tag/'. "priority";
+        return (string) $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE, $storeId);
+    }
 
-    /**
-     * SYSTEM CONFIGURATION SOCIAL FIELDS
-     */
-    CONST string XML_PATH_SOCIAL_SHARE_ENABLED = self::MODULE_SYS_KEY . '/' . self::SYS_SOCIAL . '/add_this_enabled';
-    CONST string XML_PATH_SOCIAL_NETWORKS = self::MODULE_SYS_KEY . '/' . self::SYS_SOCIAL . '/use_social_networks';
+    public function getSitemapEntityPriority(string $entity, ?int $storeId = null): string
+    {
+        $path = 'mageos_blog/sitemap/' . $entity . '/priority';
 
-    /**
-     * SYSTEM CONFIGURATION TOP MENU FIELDS
-     */
-    CONST string XML_PATH_MENU_DISPLAY_BLOG_LINK = self::MODULE_SYS_KEY . '/' . self::SYS_MENU . '/show_item';
-    CONST string XML_PATH_MENU_LINK_TEXT = self::MODULE_SYS_KEY . '/' . self::SYS_MENU . '/item_text';
-    CONST string XML_PATH_MENU_INCLUDE_BLOG_CATEGORIES = self::MODULE_SYS_KEY . '/' . self::SYS_MENU . '/include_categories';
-    CONST string XML_PATH_MENU_MAX_DEPTH = self::MODULE_SYS_KEY . '/' . self::SYS_MENU . '/max_depth';
-
-    /**
-     * SYSTEM CONFIGURATION DEVELOPER FIELDS
-     */
-    CONST string XML_PATH_DEV_CSS_INCLUDE_ALL_PAGES = self::MODULE_SYS_KEY . '/' . self::SYS_DEV . '/css_settings/include_all_pages';
-    CONST string XML_PATH_DEV_CSS_INCLUDE_HOME_PAGE = self::MODULE_SYS_KEY . '/' . self::SYS_DEV . '/css_settings/include_home_page';
-    CONST string XML_PATH_DEV_CSS_INCLUDE_PRODUCT_PAGE = self::MODULE_SYS_KEY . '/' . self::SYS_DEV . '/css_settings/include_product_page';
-    CONST string XML_PATH_DEV_CSS_CUSTOM_CSS = self::MODULE_SYS_KEY . '/' . self::SYS_DEV . '/css_settings/custom_css';
-    CONST string XML_PATH_DEV_CSS_INCLUDE_BOOTSTRAP_CUSTOM_MINI = self::MODULE_SYS_KEY . '/' . self::SYS_DEV . '/css_settings/include_bootstrap_custom_mini';
-
-    /**
-     * GLOBAL VARIABLES CONFIGURATIONS
-     */
-    CONST int MAX_NUMBER_OF_COMMENTS = 5;
-    CONST int MAX_NUMBER_OF_REPLIES = 5;
-    CONST int MAX_NUMBER_OF_RELATED_POSTS = 5;
-    CONST int MAX_NUMBER_OF_RELATED_PRODUCTS = 5;
-    CONST int MAX_NUMBER_OF_RECENT_POSTS = 5;
-    const string CANONICAL_PAGE_TYPE_NONE = 'none';
-    const string CANONICAL_PAGE_TYPE_ALL = 'all';
-    const string CANONICAL_PAGE_TYPE_INDEX = 'index';
-    const string CANONICAL_PAGE_TYPE_POST = 'post';
-    const string CANONICAL_PAGE_TYPE_CATEGORY = 'category';
-    const string CANONICAL_PAGE_TYPE_TAG = 'tag';
-    CONST string CUSTOM_BOOTSTRAP_CSS = 'bootstrap-4.4.1-custom-min.css';
-
-
-    /**
-     * Magento Constants
-     */
-    const string SCOPE_STORE = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-
-
-    protected ScopeConfigInterface $scopeConfig;
-
-    public function __construct(
-        ScopeConfigInterface $scopeConfig
-    ) {
-        $this->scopeConfig = $scopeConfig;
+        return (string) $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     /**
-     * Retrieve tag page robots
-     *
-     * @return string
+     * @return string[]
      */
-    public function getTagRobots($storeId = null): string
+    public function getSocialNetworks(?int $storeId = null): array
     {
-        return $this->getConfig(
-            self::XML_PATH_TAG_ROBOTS,
-            $storeId
-        );
-    }
-
-    /**
-     * Retrieve search page robots
-     *
-     * @return string
-     */
-    public function getSearchRobots($storeId = null): string
-    {
-        return $this->getConfig(
-            self::XML_PATH_SEARCH_ROBOTS,
-            $storeId
-        );
-    }
-
-    /**
-     * Retrieve true if blog module is enabled
-     *
-     * @return bool
-     */
-    public function isEnabled($storeId = null): bool
-    {
-        return (bool)$this->getConfig(
-            self::XML_PATH_ENABLED,
-            $storeId
-        );
-    }
-
-    /**
-     * Retrieve true if blog related posts are enabled
-     *
-     * @return bool
-     */
-    public function isRelatedPostsEnabled($storeId = null): bool
-    {
-        return (bool)$this->getConfig(
-            self::XML_PATH_POST_RELATED_POSTS,
-            $storeId
-        );
-    }
-
-    /**
-     * Retrieve true if blog related products are enabled
-     *
-     * @return bool
-     */
-    public function isRelatedProductsEnabled($storeId = null): bool
-    {
-        return (bool)$this->getConfig(
-            self::XML_PATH_POST_RELATED_PRODUCTS,
-            $storeId
-        );
-    }
-
-    /**
-     * Retrieve store config value
-     * @param string $path
-     * @param null $storeId
-     * @return mixed
-     */
-    public function getConfig($path, $storeId = null): mixed
-    {
-        return $this->scopeConfig->getValue(
-            $path,
-            ScopeInterface::SCOPE_STORE,
-            $storeId
-        );
-    }
-
-    /**
-     * @param $pageType
-     * @return bool
-     */
-    public function getDisplayCanonicalTag($pageType): bool
-    {
-
-        if ($this->getConfig(self::XML_PATH_SEO_USE_CANONICAL_META_TAG_FOR)) {
-            $displayFor = explode(',', $this->getConfig(self::XML_PATH_SEO_USE_CANONICAL_META_TAG_FOR));
-        } else {
-            $displayFor = [];
+        $raw = (string) $this->scopeConfig->getValue(self::XML_PATH_SOCIAL_NETWORKS, ScopeInterface::SCOPE_STORE, $storeId);
+        if ($raw === '') {
+            return [];
         }
 
-        return in_array($pageType, $displayFor) || in_array(self::CANONICAL_PAGE_TYPE_ALL, $displayFor) ? true : false;
+        return array_values(array_filter(array_map('trim', explode(',', $raw))));
     }
 
-    /**
-     * @param null $storeId
-     * @return bool
-     */
-    public function isBlogCssIncludeOnAll($storeId = null): bool
+    public function isRssEnabled(?int $storeId = null): bool
     {
-        return (bool)$this->getConfig(
-            self::XML_PATH_DEV_CSS_INCLUDE_ALL_PAGES,
-            $storeId
-        );
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_RSS_ENABLED, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
-    /**
-     * @param null $storeId
-     * @return bool
-     */
-    public function isBlogCssIncludeOnHome($storeId = null): bool
+    public function getRssLimit(?int $storeId = null): int
     {
-        return (bool)$this->getConfig(
-            self::XML_PATH_DEV_CSS_INCLUDE_HOME_PAGE,
-            $storeId
-        );
-    }
-
-    /**
-     * @param null $storeId
-     * @return bool
-     */
-    public function isBlogCssIncludeOnProduct($storeId = null): bool
-    {
-        return (bool)$this->getConfig(
-            self::XML_PATH_DEV_CSS_INCLUDE_PRODUCT_PAGE,
-            $storeId
-        );
-    }
-
-    /**
-     * @param $storeId
-     * @return string
-     */
-    public function getCustomCss($storeId = null): string
-    {
-        return (string)$this->getConfig(self::XML_PATH_DEV_CSS_CUSTOM_CSS, $storeId);
-    }
-
-    /**
-     * @param $storeId
-     * @return bool
-     */
-    public function getIncludeBootstrapCustomMini($storeId = null): bool
-    {
-        return (bool)$this->getConfig(
-            self::XML_PATH_DEV_CSS_INCLUDE_BOOTSTRAP_CUSTOM_MINI,
-            $storeId
-        );
-    }
-
-    /**
-     * Retrieve translated & formated date
-     * @param string $format
-     * @param $dateOrTime
-     * @return string
-     */
-    public static function getTranslatedDate(string $format, $dateOrTime): string
-    {
-        $time = is_numeric($dateOrTime) ? $dateOrTime : strtotime((string)$dateOrTime);
-        $month = ['F' => '%1', 'M' => '%2'];
-
-        foreach ($month as $from => $to) {
-            $format = str_replace($from, $to, $format);
-        }
-
-        $date = date($format, $time);
-
-        foreach ($month as $to => $from) {
-            $date = str_replace($from, date($to, $time), $date);
-        }
-
-        return $date;
+        return (int) $this->scopeConfig->getValue(self::XML_PATH_RSS_LIMIT, ScopeInterface::SCOPE_STORE, $storeId);
     }
 }

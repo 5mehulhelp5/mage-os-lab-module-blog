@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\UrlRewriteGraphQl\Model\Resolver\UrlRewrite\CustomUrlLocator">
+        <arguments>
+            <argument name="urlLocators" xsi:type="array">
+                <item name="blog_post" xsi:type="object">MageOS\Blog\Model\Resolver\UrlResolver\BlogPost</item>
+                <item name="blog_category" xsi:type="object">MageOS\Blog\Model\Resolver\UrlResolver\BlogCategory</item>
+                <item name="blog_tag" xsi:type="object">MageOS\Blog\Model\Resolver\UrlResolver\BlogTag</item>
+                <item name="blog_author" xsi:type="object">MageOS\Blog\Model\Resolver\UrlResolver\BlogAuthor</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

@@ -1,55 +1,30 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\Blog\Api;
 
-use MageOS\Blog\Model\Tag;
-use MageOS\Blog\Model\TagFactory;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use MageOS\Blog\Api\Data\TagInterface;
+use MageOS\Blog\Api\Data\TagSearchResultsInterface;
 
-/**
- * Interface TagRepositoryInterface
- */
 interface TagRepositoryInterface
 {
-    /**
-     * @return TagFactory
-     */
-    public function getFactory();
+    /** @throws CouldNotSaveException */
+    public function save(TagInterface $tag): TagInterface;
 
-    /**
-     * @param Tag $tag
-     * @return mixed
-     */
-    public function save(Tag $tag);
+    /** @throws NoSuchEntityException */
+    public function getById(int $id): TagInterface;
 
-    /**
-     * @param $tagId
-     * @return mixed
-     */
-    public function getById($tagId);
+    /** @throws NoSuchEntityException */
+    public function getByUrlKey(string $urlKey, int $storeId): TagInterface;
 
-    /**
-     * Retrieve Tag matching the specified criteria.
-     *
-     * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
-     * @return \Magento\Framework\Api\SearchResults
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    public function getList(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria);
+    public function getList(SearchCriteriaInterface $criteria): TagSearchResultsInterface;
 
-    /**
-     * @param Tag $tag
-     * @return mixed
-     */
-    public function delete(Tag $tag);
+    public function delete(TagInterface $tag): bool;
 
-    /**
-     * Delete Tag by ID.
-     *
-     * @param int $tagId
-     * @return bool true on success
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    public function deleteById($tagId);
+    /** @throws NoSuchEntityException */
+    public function deleteById(int $id): bool;
 }

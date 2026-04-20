@@ -1,90 +1,66 @@
 <?php
+
 declare(strict_types=1);
+
 namespace MageOS\Blog\Controller\Tag;
 
-use Magento\Framework\App\Action\Context;
-use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\Forward;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Registry;
+use Magento\Framework\View\Result\Page;
+use MageOS\Blog\Api\TagRepositoryInterface;
+use MageOS\Blog\Model\Config;
 
-/**
- * Blog tag posts view
- */
-class View extends \MageOS\Blog\App\Action\Action
+class View implements HttpGetActionInterface
 {
-    /**
-     * Store manager
-     *
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
-    private $_storeManager;
-
-    /**
-     * @var \MageOS\Blog\Model\Url
-     */
-    protected $url;
+    public const REGISTRY_KEY = 'current_blog_tag';
 
     public function __construct(
-        Context $context,
-        \MageOS\Blog\Model\Url $url = null
+        private readonly ResultFactory $resultFactory,
+        private readonly RequestInterface $request,
+        private readonly Config $config,
+        private readonly TagRepositoryInterface $repository,
+        private readonly Registry $registry
     ) {
-        parent::__construct($context);
-        $this->url = $url ?: $this->_objectManager->get(\MageOS\Blog\Model\Url::class);
     }
 
-
-    public function execute()
+    public function execute(): ResultInterface
     {
-        if (!$this->moduleEnabled()) {
-            return $this->_forwardNoroute();
+        if (!$this->config->isEnabled()) {
+            return $this->notFound();
         }
 
-        $tag = $this->_initTag();
-        if (!$tag) {
-            $resultRedirect = $this->resultRedirectFactory->create();
-            $resultRedirect->setHttpResponseCode(301);
-            $resultRedirect->setPath($this->url->getBaseUrl());
-            return $resultRedirect;
+        $tagId = (int) $this->request->getParam('id');
+        if ($tagId <= 0) {
+            return $this->notFound();
         }
 
-        $this->_objectManager->get(\Magento\Framework\Registry::class)->register('current_blog_tag', $tag);
+        try {
+            $tag = $this->repository->getById($tagId);
+        } catch (NoSuchEntityException) {
+            return $this->notFound();
+        }
 
-        $resultPage = $this->_objectManager->get(\MageOS\Blog\Helper\Page::class)
-            ->prepareResultPage($this, $tag);
+        if (!$tag->getIsActive()) {
+            return $this->notFound();
+        }
 
-        return $resultPage;
+        $this->registry->register(self::REGISTRY_KEY, $tag);
+
+        /** @var Page $page */
+        $page = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
+        $page->getConfig()->getTitle()->set((string) ($tag->getMetaTitle() ?: $tag->getTitle()));
+        return $page;
     }
 
-    /**
-     * Init Tag
-     *
-     * @return \MageOS\Blog\Model\Tag || false
-     */
-    protected function _initTag()
+    private function notFound(): Forward
     {
-        $id = (int)$this->getRequest()->getParam('id');
-        if (!$id) {
-            return false;
-        }
-
-        $storeId = $this->getStoreManager()->getStore()->getId();
-        $tag = $this->_objectManager->create(\MageOS\Blog\Model\Tag::class)->load($id);
-
-        if (!$tag->isVisibleOnStore($storeId)) {
-            return false;
-        }
-
-        $tag->setStoreId($storeId);
-
-        return $tag;
-    }
-
-    /**
-     * @return \Magento\Store\Model\StoreManagerInterface|mixed
-     */
-    private function getStoreManager()
-    {
-        if (null === $this->_storeManager) {
-            $this->_storeManager = $this->_objectManager->get(\Magento\Store\Model\StoreManagerInterface::class);
-        }
-        return $this->_storeManager;
+        /** @var Forward $forward */
+        $forward = $this->resultFactory->create(ResultFactory::TYPE_FORWARD);
+        return $forward->forward('noroute');
     }
 }

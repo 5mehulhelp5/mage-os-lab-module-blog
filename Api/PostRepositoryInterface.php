@@ -1,62 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageOS\Blog\Api;
 
 use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\Api\SearchResultsInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use MageOS\Blog\Model\Post;
-use MageOS\Blog\Model\PostFactory;
+use MageOS\Blog\Api\Data\PostInterface;
+use MageOS\Blog\Api\Data\PostSearchResultsInterface;
 
-/**
- * Interface PostRepositoryInterface
- */
 interface PostRepositoryInterface
 {
-    /**
-     * @return PostFactory
-     */
-    public function getFactory(): PostFactory;
+    /** @throws CouldNotSaveException */
+    public function save(PostInterface $post): PostInterface;
 
-    /**
-     * @param Post $post
-     * @return mixed
-     * @throws CouldNotSaveException
-     */
-    public function save(Post $post): mixed;
+    /** @throws NoSuchEntityException */
+    public function getById(int $id): PostInterface;
 
-    /**
-     * @param $postId
-     * @return mixed
-     */
-    public function getById($postId): mixed;
+    /** @throws NoSuchEntityException */
+    public function getByUrlKey(string $urlKey, int $storeId): PostInterface;
 
-    /**
-     * Retrieve model matching the specified criteria.
-     * @param SearchCriteriaInterface $searchCriteria
-     * @return SearchResultsInterface
-     * @throws LocalizedException
-     */
-    public function getList(
-        SearchCriteriaInterface $searchCriteria
-    ): SearchResultsInterface;
+    public function getList(SearchCriteriaInterface $criteria): PostSearchResultsInterface;
 
-    /**
-     * @param Post $post
-     * @return bool true on success
-     * @throws LocalizedException
-     */
-    public function delete(Post $post): bool;
+    public function delete(PostInterface $post): bool;
 
-    /**
-     * Delete Post by ID.
-     *
-     * @param int $postId
-     * @return bool true on success
-     * @throws NoSuchEntityException
-     * @throws LocalizedException
-     */
-    public function deleteById(int $postId): bool;
+    /** @throws NoSuchEntityException */
+    public function deleteById(int $id): bool;
 }

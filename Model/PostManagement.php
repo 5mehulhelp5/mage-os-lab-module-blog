@@ -1,109 +1,52 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\Blog\Model;
 
-/**
- * Post management model
- */
-class PostManagement extends AbstractManagement
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Sql\Expression;
+use MageOS\Blog\Api\PostManagementInterface;
+use MageOS\Blog\Api\PostRepositoryInterface;
+
+class PostManagement implements PostManagementInterface
 {
-    /**
-     * @var \MageOS\Blog\Model\PostFactory
-     */
-    protected $_itemFactory;
+    private const WORDS_PER_MINUTE = 200;
 
-    /**
-     * Initialize dependencies.
-     *
-     * @param \MageOS\Blog\Model\PostFactory $postFactory
-     */
     public function __construct(
-        \MageOS\Blog\Model\PostFactory $postFactory
+        private readonly PostRepositoryInterface $repository,
+        private readonly ResourceConnection $resource
     ) {
-        $this->_itemFactory = $postFactory;
     }
 
-    /**
-     * Retrieve list of post by page type, term, store, etc
-     *
-     * @param  string $type
-     * @param  string $term
-     * @param  int $storeId
-     * @param  int $page
-     * @param  int $limit
-     * @return string
-     */
-    public function getList($type, $term, $storeId, $page, $limit)
+    public function publish(int $postId): void
     {
-        try {
-            $collection = $this->_itemFactory->create()->getCollection();
-            $collection
-                ->addActiveFilter()
-                ->addStoreFilter($storeId)
-                ->setOrder('publish_time', 'DESC')
-                ->setCurPage($page)
-                ->setPageSize($limit);
-
-            $type = strtolower($type);
-
-            switch ($type) {
-                case 'category':
-                    $collection->addCategoryFilter($term);
-                    break;
-                case 'search':
-                    $collection->addSearchFilter($term);
-                    break;
-                case 'tag':
-                    $collection->addTagFilter($term);
-                    break;
-            }
-
-            $posts = [];
-            foreach ($collection as $item) {
-                $posts[] = $this->getDynamicData($item);
-            }
-
-            $result = [
-                'posts' => $posts,
-                'total_number' => $collection->getSize(),
-                'current_page' => $collection->getCurPage(),
-                'last_page' => $collection->getLastPageNumber(),
-            ];
-
-            return json_encode($result);
-        } catch (\Exception $e) {
-            return false;
-        }
+        $post = $this->repository->getById($postId);
+        $post->setStatus(BlogPostStatus::Published->value);
+        $this->repository->save($post);
     }
 
-    /**
-     * @param $item
-     * @return array
-     */
-    protected function getDynamicData($item)
+    public function incrementViews(int $postId): void
     {
-        $data = $item->getData();
+        $connection = $this->resource->getConnection();
+        $connection->update(
+            $this->resource->getTableName('mageos_blog_post'),
+            ['views_count' => new Expression('views_count + 1')],
+            ['post_id = ?' => $postId]
+        );
+    }
 
-        $keys = [
-            'og_image',
-            'og_type',
-            'og_description',
-            'og_title',
-            'meta_description',
-            'meta_title',
-            'short_filtered_content',
-            'filtered_content',
-            'first_image',
-            'featured_image',
-            'post_url',
-        ];
-
-        foreach ($keys as $key) {
-            $method = 'get' . str_replace('_', '', ucwords($key, '_'));
-            $data[$key] = $item->$method();
+    public function computeReadingTime(string $content): int
+    {
+        $plainText = trim(strip_tags($content));
+        if ($plainText === '') {
+            return 0;
+        }
+        $wordCount = str_word_count($plainText);
+        if ($wordCount === 0) {
+            return 0;
         }
 
-        return $data;
+        return max(1, (int) ceil($wordCount / self::WORDS_PER_MINUTE));
     }
 }

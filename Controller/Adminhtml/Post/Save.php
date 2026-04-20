@@ -1,161 +1,173 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\Blog\Controller\Adminhtml\Post;
 
-use MageOS\Blog\Model\Post;
+use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\App\Request\Http as HttpRequest;
+use Magento\Framework\Controller\Result\Redirect;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use MageOS\Blog\Api\Data\PostInterface;
+use MageOS\Blog\Api\Data\PostInterfaceFactory;
+use MageOS\Blog\Api\PostRepositoryInterface;
+use MageOS\Blog\Api\UrlKeyGeneratorInterface;
+use MageOS\Blog\Model\ImageUploader;
 
-/**
- * Blog post save controller
- */
-class Save extends \MageOS\Blog\Controller\Adminhtml\Post
+class Save extends Action implements HttpPostActionInterface
 {
-    /**
-     * @var string
-     */
-    protected $_allowedKey = 'MageOS_Blog::post_save';
+    public const ADMIN_RESOURCE = 'MageOS_Blog::post';
 
-    /**
-     * Before model save
-     * @param  \MageOS\Blog\Model\Post $model
-     * @param  \Magento\Framework\App\Request\Http $request
-     * @return void
-     */
-    protected function _beforeSave($model, $request)
+    public function __construct(
+        Context $context,
+        private readonly PostRepositoryInterface $repository,
+        private readonly PostInterfaceFactory $postFactory,
+        private readonly UrlKeyGeneratorInterface $urlKeyGenerator,
+        private readonly ImageUploader $imageUploader
+    ) {
+        parent::__construct($context);
+    }
+
+    public function execute(): ResultInterface
     {
-        /* Prepare empty categories and coauthors */
-        foreach (['categories', 'coauthors'] as $key) {
-            if (!$request->getPost($key)) {
-                $model->setData($key, []);
-            }
+        /** @var Redirect $result */
+        $result = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+        $request = $this->getRequest();
+        $data = $request instanceof HttpRequest ? (array) $request->getPostValue() : [];
+
+        if ($data === []) {
+            return $result->setPath('*/*/');
         }
 
-        /* Prepare relative links */
-        $data = $request->getPost('data');
-        $links = isset($data['links']) ? $data['links'] : ['post' => [], 'product' => []];
-        if (is_array($links)) {
-            foreach (['post', 'product'] as $linkType) {
-                if (isset($links[$linkType]) && is_array($links[$linkType])) {
-                    $linksData = [];
-                    foreach ($links[$linkType] as $item) {
-                        $linksData[$item['id']] = [
-                            'position' => isset($item['position']) ? $item['position'] : 0
-                        ];
-                    }
-                    $links[$linkType] = $linksData;
+        $postId = isset($data['post_id']) ? (int) $data['post_id'] : 0;
+
+        try {
+            $post = $postId > 0
+                ? $this->repository->getById($postId)
+                : $this->postFactory->create();
+
+            $this->hydrate($post, $data);
+            $saved = $this->repository->save($post);
+
+            $this->messageManager->addSuccessMessage((string) __('Post saved.'));
+
+            if ((int) $this->getRequest()->getParam('back')) {
+                return $result->setPath('*/*/edit', ['post_id' => (int) $saved->getPostId()]);
+            }
+            return $result->setPath('*/*/');
+        } catch (NoSuchEntityException) {
+            $this->messageManager->addErrorMessage((string) __('This post no longer exists.'));
+        } catch (LocalizedException $e) {
+            $this->messageManager->addErrorMessage($e->getMessage());
+            $this->storeSession($data);
+            return $result->setPath('*/*/edit', ['post_id' => $postId]);
+        } catch (\Exception $e) {
+            $this->messageManager->addExceptionMessage($e, (string) __('Could not save post: %1', $e->getMessage()));
+            $this->storeSession($data);
+            return $result->setPath('*/*/edit', ['post_id' => $postId]);
+        }
+
+        return $result->setPath('*/*/');
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function hydrate(PostInterface $post, array $data): void
+    {
+        $scalarFields = [
+            'title', 'url_key', 'content', 'short_content',
+            'featured_image_alt', 'meta_title', 'meta_description',
+            'meta_keywords', 'meta_robots', 'og_title', 'og_description',
+            'og_type', 'publish_date',
+        ];
+        foreach ($scalarFields as $field) {
+            if (\array_key_exists($field, $data)) {
+                $setter = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $field)));
+                $value = $data[$field];
+                if ($value === '' || $value === null) {
+                    $post->{$setter}(null);
                 } else {
-                    $links[$linkType] = [];
+                    $post->{$setter}((string) $value);
                 }
             }
-            $model->setData('links', $links);
         }
 
-        /* Prepare images */
-        $this->prepareImagesBeforeSave($model, ['featured_img', 'featured_list_img', 'og_img']);
-
-        /* Prepare Media Gallery */
-        $data = $model->getData();
-
-        if (!empty($data['media_gallery']['images'])) {
-            $images = $data['media_gallery']['images'];
-            usort($images, function ($imageA, $imageB) {
-                if (!isset($imageA['position'])) {
-                    $imageA['position'] = 0;
-                }
-                if (!isset($imageB['position'])) {
-                    $imageB['position'] = 0;
-                }
-                return ($imageA['position'] < $imageB['position']) ? -1 : 1;
-            });
-            $gallery = [];
-            foreach ($images as $image) {
-                if (empty($image['removed'])) {
-                    if (!empty($image['value_id'])) {
-                        $gallery[] = $image['value_id'];
-                    } elseif (!empty($image['file'])) {
-                        $imageUploader = $this->_objectManager->get(
-                            \MageOS\Blog\ImageUpload::class
-                        );
-                        $image['file'] = $imageUploader->moveFileFromTmp($image['file'], true);
-                        $gallery[] = $image['file'];
-                    }
-                }
-            }
-
-            $model->setGalleryImages($gallery);
+        if (isset($data['title']) && (!isset($data['url_key']) || $data['url_key'] === '')) {
+            $post->setUrlKey($this->urlKeyGenerator->generate(
+                (string) $data['title'],
+                UrlKeyGeneratorInterface::ENTITY_POST
+            ));
         }
 
-        /* Prepare Tags */
-        $tagInput = trim((string)$request->getPost('tag_input'));
-        if ($tagInput) {
-            $tagInput = explode(',', $tagInput);
+        if (isset($data['status'])) {
+            $post->setStatus((int) $data['status']);
+        }
+        if (isset($data['author_id']) && $data['author_id'] !== '') {
+            $post->setAuthorId((int) $data['author_id']);
+        }
 
-            $tagsCollection = $this->_objectManager->create(\MageOS\Blog\Model\ResourceModel\Tag\Collection::class);
-            $allTags = [];
-            foreach ($tagsCollection as $item) {
-                if (!$item->getTitle()) {
-                    continue;
-                }
-                $allTags[((string)$item->getTitle())] = $item->getId();
+        $post->setStoreIds($this->parseIdList($data['store_ids'] ?? []));
+        $post->setCategoryIds($this->parseIdList($data['category_ids'] ?? []));
+        $post->setTagIds($this->parseIdList($data['tag_ids'] ?? []));
+
+        foreach (['featured_image', 'og_image'] as $field) {
+            $raw = $data[$field] ?? null;
+            $fileName = $this->extractUploadedFileName($raw);
+            $setter = 'set' . str_replace(' ', '', ucwords(str_replace('_', ' ', $field)));
+            if ($fileName === null) {
+                $post->{$setter}(null);
+                continue;
             }
-
-            $tags = [];
-            foreach ($tagInput as $tagTitle) {
-                $tagTitle = trim((string)$tagTitle);
-                if (!$tagTitle) {
-                    continue;
-                }
-                if (empty($allTags[$tagTitle])) {
-                    $tagModel = $this->_objectManager->create(\MageOS\Blog\Model\Tag::class);
-                    $tagModel->setData('title', $tagTitle);
-                    $tagModel->setData('is_active', 1);
-                    $tagModel->save();
-
-                    $tags[] = $tagModel->getId();
-                } else {
-                    $tags[] = $allTags[$tagTitle];
-                }
+            // If still in tmp dir, move to permanent.
+            if (\is_array($raw) && isset($raw[0]['tmp_name'])) {
+                $fileName = $this->imageUploader->moveFileFromTmp($fileName);
             }
-            $model->setData('tags', $tags);
-        } else {
-            $model->setData('tags', []);
+            $post->{$setter}($fileName);
         }
     }
 
     /**
-     * Filter request params
-     * @param array $data
-     * @return array
+     * @return int[]
      */
-    protected function filterParams(array $data): array
+    private function parseIdList(mixed $raw): array
     {
-        /* Prepare dates */
-        $dateTimeFilter = $this->_objectManager->create(\Magento\Framework\Stdlib\DateTime\Filter\DateTime::class);
-        $dateFilter = $this->_objectManager->create(\Magento\Framework\Stdlib\DateTime\Filter\Date::class);
-
-        $filterRules = [];
-        foreach (['publish_time', 'end_time', 'custom_theme_from', 'custom_theme_to'] as $dateField) {
-            if (!empty($data[$dateField])) {
-                $filterRules[$dateField] = $dateFilter;
-                $data[$dateField] = preg_replace('/(.*)(\+\d\d\d\d\d\d)(\d\d)/U', '$1$3', $data[$dateField]);
-
-                if (!preg_match('/\d{1}:\d{2}/', (string)$data[$dateField])) {
-                    /*$data[$dateField] .= " 00:00";*/
-                    $filterRules[$dateField] = $dateFilter;
-                } else {
-                    $filterRules[$dateField] = $dateTimeFilter;
-                }
-            }
+        if (\is_string($raw)) {
+            $raw = $raw === '' ? [] : explode(',', $raw);
         }
+        if (!\is_array($raw)) {
+            return [];
+        }
+        return array_values(array_filter(
+            array_map('intval', $raw),
+            static fn (int $id): bool => $id > 0
+        ));
+    }
 
-        $inputFilter = $this->getFilterInput(
-            $filterRules,
-            [],
-            $data
-        );
+    private function extractUploadedFileName(mixed $raw): ?string
+    {
+        if (\is_string($raw) && $raw !== '') {
+            return $raw;
+        }
+        if (\is_array($raw) && isset($raw[0]['name'])) {
+            return (string) $raw[0]['name'];
+        }
+        return null;
+    }
 
-        $data = $inputFilter->getUnescaped();
-
-        return $data;
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function storeSession(array $data): void
+    {
+        $session = $this->_session;
+        if (method_exists($session, 'setMageosBlogPostFormData')) {
+            $session->setMageosBlogPostFormData($data);
+        }
     }
 }

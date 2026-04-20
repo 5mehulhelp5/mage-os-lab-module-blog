@@ -1,0 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+/** @var \MageOS\Blog\Block\Widget\CategoryLink $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$category = $block->getCategory();
+?>
+<?php if ($category !== null): ?>
+    <a class="mageos-blog-widget mageos-blog-widget--category-link"
+       href="<?= $escaper->escapeUrl($block->getCategoryUrl($category)); ?>">
+        <?= $escaper->escapeHtml($block->getLabel($category)); ?>
+    </a>
+<?php endif; ?>

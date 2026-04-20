@@ -1,55 +1,30 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\Blog\Api;
 
-use MageOS\Blog\Model\Category;
-use MageOS\Blog\Model\CategoryFactory;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use MageOS\Blog\Api\Data\CategoryInterface;
+use MageOS\Blog\Api\Data\CategorySearchResultsInterface;
 
-/**
- * Interface PostRepositoryInterface
- */
 interface CategoryRepositoryInterface
 {
-    /**
-     * @return CategoryFactory
-     */
-    public function getFactory();
+    /** @throws CouldNotSaveException */
+    public function save(CategoryInterface $category): CategoryInterface;
 
-    /**
-     * @param Category $category
-     * @return mixed
-     */
-    public function save(Category $category);
+    /** @throws NoSuchEntityException */
+    public function getById(int $id): CategoryInterface;
 
-    /**
-     * @param $categoryId
-     * @return mixed
-     */
-    public function getById($categoryId);
+    /** @throws NoSuchEntityException */
+    public function getByUrlKey(string $urlKey, int $storeId): CategoryInterface;
 
-    /**
-     * Retrieve Category matching the specified criteria.
-     *
-     * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
-     * @return \Magento\Framework\Api\SearchResults
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    public function getList(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria);
+    public function getList(SearchCriteriaInterface $criteria): CategorySearchResultsInterface;
 
-    /**
-     * @param Category $category
-     * @return mixed
-     */
-    public function delete(Category $category);
+    public function delete(CategoryInterface $category): bool;
 
-    /**
-     * Delete Category by ID.
-     *
-     * @param int $categoryId
-     * @return bool true on success
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    public function deleteById($categoryId);
+    /** @throws NoSuchEntityException */
+    public function deleteById(int $id): bool;
 }

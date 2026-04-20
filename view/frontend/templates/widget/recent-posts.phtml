@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+/** @var \MageOS\Blog\Block\Widget\RecentPosts $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$posts = $block->getPosts();
+$title = $block->getTitleSafe();
+?>
+<div class="mageos-blog-widget mageos-blog-widget--recent-posts">
+    <?php if ($title !== ''): ?>
+        <h3 class="mageos-blog-widget__title"><?= $escaper->escapeHtml($title); ?></h3>
+    <?php endif; ?>
+
+    <?php if (count($posts) === 0): ?>
+        <p class="mageos-blog-widget__empty"><?= $escaper->escapeHtml(__('No posts yet.')); ?></p>
+    <?php else: ?>
+        <ul class="mageos-blog-widget__items">
+            <?php foreach ($posts as $post): ?>
+                <li class="mageos-blog-widget__item">
+                    <a href="<?= $escaper->escapeUrl($block->getPostUrl($post)); ?>">
+                        <?= $escaper->escapeHtml($post->getTitle()); ?>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
+</div>

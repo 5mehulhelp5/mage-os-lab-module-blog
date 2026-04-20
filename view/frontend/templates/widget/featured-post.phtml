@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+/** @var \MageOS\Blog\Block\Widget\FeaturedPost $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$post = $block->getPost();
+$title = $block->getTitleSafe();
+?>
+<?php if ($post !== null): ?>
+    <div class="mageos-blog-widget mageos-blog-widget--featured-post">
+        <?php if ($title !== ''): ?>
+            <h3 class="mageos-blog-widget__title"><?= $escaper->escapeHtml($title); ?></h3>
+        <?php endif; ?>
+
+        <article class="mageos-blog-widget__featured">
+            <h4>
+                <a href="<?= $escaper->escapeUrl($block->getPostUrl($post)); ?>">
+                    <?= $escaper->escapeHtml($post->getTitle()); ?>
+                </a>
+            </h4>
+            <?php if ($post->getShortContent()): ?>
+                <div class="mageos-blog-widget__excerpt">
+                    <?= /** @noEscape */ $post->getShortContent(); ?>
+                </div>
+            <?php endif; ?>
+        </article>
+    </div>
+<?php endif; ?>

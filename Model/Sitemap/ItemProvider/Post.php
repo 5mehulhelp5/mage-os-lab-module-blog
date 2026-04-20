@@ -1,93 +1,65 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\Blog\Model\Sitemap\ItemProvider;
 
-use MageOS\Blog\Model\ResourceModel\Post\CollectionFactory;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Model\AbstractModel;
 use Magento\Sitemap\Model\ItemProvider\ItemProviderInterface;
 use Magento\Sitemap\Model\SitemapItemInterfaceFactory;
-use MageOS\Blog\Api\SitemapConfigInterface;
+use MageOS\Blog\Api\Data\PostInterface;
+use MageOS\Blog\Api\PostRepositoryInterface;
+use MageOS\Blog\Model\BlogPostStatus;
+use MageOS\Blog\Model\Config;
 
 class Post implements ItemProviderInterface
 {
-    /**
-     * Sitemap config
-     *
-     * @var SitemapConfigInterface
-     */
-    private $sitemapConfig;
+    private const ENTITY_SLUG = 'post';
 
-    /**
-     * Blog post collection factory
-     *
-     * @var CollectionFactory
-     */
-    private $collectionFactory;
-
-    /**
-     * Sitemap item factory
-     *
-     * @var SitemapItemInterfaceFactory
-     */
-    private $itemFactory;
-
-    /**
-     * @param SitemapConfigInterface $sitemapConfig
-     * @param CollectionFactory $collectionFactory
-     * @param SitemapItemInterfaceFactory $itemFactory
-     */
     public function __construct(
-        SitemapConfigInterface $sitemapConfig,
-        CollectionFactory $collectionFactory,
-        SitemapItemInterfaceFactory $itemFactory
+        private readonly PostRepositoryInterface $repository,
+        private readonly SearchCriteriaBuilder $criteriaBuilder,
+        private readonly SitemapItemInterfaceFactory $sitemapItemFactory,
+        private readonly Config $config
     ) {
-        $this->sitemapConfig = $sitemapConfig;
-        $this->collectionFactory = $collectionFactory;
-        $this->itemFactory = $itemFactory;
     }
 
     /**
-     * {@inheritdoc}
+     * @param int $storeId
+     * @return \Magento\Sitemap\Model\SitemapItemInterface[]
      */
-    public function getItems($storeId)
+    public function getItems($storeId): array
     {
-        if (!$this->sitemapConfig->isEnabledSitemap(SitemapConfigInterface::POSTS_PAGE, $storeId)) {
+        if (!$this->config->isSitemapEntityEnabled(self::ENTITY_SLUG, (int) $storeId)) {
             return [];
         }
 
-        $collection = $this->collectionFactory->create()
-            ->addStoreFilter($storeId)
-            ->addActiveFilter()
-            ->getItems();
+        $criteria = $this->criteriaBuilder
+            ->addFilter(PostInterface::STATUS, BlogPostStatus::Published->value)
+            ->create();
 
-        $items = array_map(function ($item) use ($storeId) {
+        $frequency = $this->config->getSitemapEntityFrequency(self::ENTITY_SLUG, (int) $storeId) ?: 'weekly';
+        $priority = $this->config->getSitemapEntityPriority(self::ENTITY_SLUG, (int) $storeId) ?: '0.5';
 
-            $data = [
-                'url' => $item->getUrl(),
-                'updatedAt' => $item->getUpdatedAt(),
-                'priority' => $this->sitemapConfig->getPriority(SitemapConfigInterface::POSTS_PAGE, $storeId),
-                'changeFrequency' => $this->sitemapConfig->getFrequency(SitemapConfigInterface::POSTS_PAGE, $storeId),
-            ];
-
-            $images = [];
-            if ($item->getFeaturedImage()) {
-                $images[] = new \Magento\Framework\DataObject(['url' => $item->getFeaturedImage()]);
+        $items = [];
+        foreach ($this->repository->getList($criteria)->getItems() as $post) {
+            $storeIds = $post->getStoreIds();
+            if ($storeIds !== []
+                && !\in_array((int) $storeId, $storeIds, true)
+                && !\in_array(0, $storeIds, true)
+            ) {
+                continue;
             }
-            if ($item->getGalleryImages()) {
-                $images = array_merge($images, $item->getGalleryImages());
-            }
-
-            if ($images) {
-                $imagesCollection = new \Magento\Framework\DataObject();
-                $imagesCollection->setTitle($item->getTitle());
-                $imagesCollection->setThumbnail($images[0]->getUrl());
-                $imagesCollection->setCollection($images);
-                $data['images'] = $imagesCollection;
-            }
-
-            return $this->itemFactory->create($data);
-        }, $collection);
-
+            $updatedAt = $post instanceof AbstractModel ? (string) ($post->getData('update_time') ?? '') : '';
+            $items[] = $this->sitemapItemFactory->create([
+                'url' => 'blog/' . $post->getUrlKey(),
+                'priority' => (string) $priority,
+                'changeFrequency' => (string) $frequency,
+                'updatedAt' => $updatedAt,
+                'images' => null,
+            ]);
+        }
         return $items;
     }
 }

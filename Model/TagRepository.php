@@ -1,89 +1,140 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\Blog\Model;
 
-use MageOS\Blog\Model\AbstractRepository;
-use MageOS\Blog\Api\TagRepositoryInterface;
-use MageOS\Blog\Model\TagFactory;
-use MageOS\Blog\Model\ResourceModel\Tag as TagResourceModel;
-use MageOS\Blog\Model\ResourceModel\Tag\CollectionFactory;
-use Magento\Framework\Api\SearchResultsFactory;
-use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Exception\CouldNotDeleteException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use MageOS\Blog\Api\Data\TagInterface;
+use MageOS\Blog\Api\Data\TagSearchResultsInterface;
+use MageOS\Blog\Api\Data\TagSearchResultsInterfaceFactory;
+use MageOS\Blog\Api\TagRepositoryInterface;
+use MageOS\Blog\Api\UrlKeyGeneratorInterface;
+use MageOS\Blog\Model\ResourceModel\Tag as TagResource;
+use MageOS\Blog\Model\ResourceModel\Tag\CollectionFactory as TagCollectionFactory;
+use MageOS\Blog\Model\Tag\Link\StoreLinkManager;
 
-class TagRepository extends AbstractRepository implements TagRepositoryInterface
+class TagRepository implements TagRepositoryInterface
 {
-    private TagFactory $tagFactory;
-
     public function __construct(
-        TagFactory $tagFactory,
-        TagResourceModel $tagResourceModel,
-        CollectionFactory $collectionFactory,
-        SearchResultsFactory $searchResultsFactory,
-        CollectionProcessorInterface $collectionProcessor = null
+        private readonly TagResource $resource,
+        private readonly TagFactory $tagFactory,
+        private readonly TagCollectionFactory $collectionFactory,
+        private readonly TagSearchResultsInterfaceFactory $searchResultsFactory,
+        private readonly CollectionProcessorInterface $collectionProcessor,
+        private readonly StoreLinkManager $storeLinks,
+        private readonly UrlKeyGeneratorInterface $urlKeyGenerator,
     ) {
-        parent::__construct(
-            $tagResourceModel,
-            $tagFactory,
-            $collectionFactory,
-            $searchResultsFactory,
-            $collectionProcessor
-        );
-        $this->tagFactory = $tagFactory;
     }
 
-    /**
-     * @return TagFactory
-     */
-    public function getFactory()
+    public function save(TagInterface $tag): TagInterface
     {
-        return $this->tagFactory;
+        if (!$tag instanceof Tag) {
+            throw new CouldNotSaveException(__('Unsupported tag entity: %1', $tag::class));
+        }
+
+        try {
+            $this->urlKeyGenerator->validate(
+                (string) $tag->getUrlKey(),
+                UrlKeyGeneratorInterface::ENTITY_TAG,
+                null,
+                $tag->getTagId() !== null ? (int) $tag->getTagId() : null
+            );
+        } catch (\InvalidArgumentException $e) {
+            throw new LocalizedException(__($e->getMessage()), $e);
+        }
+
+        try {
+            $this->resource->save($tag);
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(__('Could not save the blog tag: %1', $e->getMessage()), $e);
+        }
+
+        $tagId = (int) $tag->getTagId();
+        $this->storeLinks->sync($tagId, $tag->getStoreIds());
+
+        return $this->getById($tagId);
     }
 
-    /**
-     * {@inheritdoc}
-     * @throws CouldNotSaveException
-     */
-    public function save(Tag $tag)
+    public function getById(int $id): TagInterface
     {
-        return $this->genericSave($tag);
+        $tag = $this->tagFactory->create();
+        $this->resource->load($tag, $id);
+        if (!$tag->getTagId()) {
+            throw NoSuchEntityException::singleField('tagId', $id);
+        }
+        $this->hydrateLinks($tag);
+
+        return $tag;
     }
 
-    /**
-     * {@inheritdoc}
-     * @throws NoSuchEntityException
-     */
-    public function getById($tagId, $editMode = false, $storeId = null, $forceReload = false)
+    public function getByUrlKey(string $urlKey, int $storeId): TagInterface
     {
-        return $this->genericGet($tagId);
+        $collection = $this->collectionFactory->create();
+        $collection->addFieldToFilter(TagInterface::URL_KEY, $urlKey);
+        $collection->getSelect()
+            ->join(
+                ['s' => $this->resource->getTable('mageos_blog_tag_store')],
+                's.tag_id = main_table.tag_id',
+                []
+            )
+            ->where('s.store_id IN (?)', [$storeId, 0])
+            ->group('main_table.tag_id');
+
+        $tag = $collection->getFirstItem();
+        if (!$tag->getTagId()) {
+            throw NoSuchEntityException::doubleField('urlKey', $urlKey, 'storeId', $storeId);
+        }
+        if (!$tag instanceof Tag) {
+            throw new \LogicException('Collection returned unexpected entity class.');
+        }
+        $this->hydrateLinks($tag);
+
+        return $tag;
     }
 
-    /**
-     * {@inheritdoc}
-     * @throws CouldNotDeleteException
-     */
-    public function delete(Tag $tag)
+    public function getList(SearchCriteriaInterface $criteria): TagSearchResultsInterface
     {
-        return $this->genericDelete($tag);
+        $collection = $this->collectionFactory->create();
+        $this->collectionProcessor->process($criteria, $collection);
+
+        $results = $this->searchResultsFactory->create();
+        $results->setSearchCriteria($criteria);
+        /** @var TagInterface[] $items */
+        $items = $collection->getItems();
+        $results->setItems($items);
+        $results->setTotalCount($collection->getSize());
+
+        return $results;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteById($tagId): bool
+    public function delete(TagInterface $tag): bool
     {
-        return $this->genericDeleteById((string)$tagId);
+        if (!$tag instanceof Tag) {
+            throw new CouldNotDeleteException(__('Unsupported tag entity: %1', $tag::class));
+        }
+        try {
+            $this->resource->delete($tag);
+        } catch (\Exception $e) {
+            throw new CouldNotDeleteException(__('Could not delete the blog tag: %1', $e->getMessage()), $e);
+        }
+
+        return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getList(SearchCriteriaInterface $searchCriteria)
+    public function deleteById(int $id): bool
     {
-        return $this->genericGetList($searchCriteria);
+        return $this->delete($this->getById($id));
+    }
+
+    private function hydrateLinks(TagInterface $tag): void
+    {
+        $id = (int) $tag->getTagId();
+        $tag->setStoreIds($this->storeLinks->getLinkedIds($id));
     }
 }

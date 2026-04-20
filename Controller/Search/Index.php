@@ -1,25 +1,45 @@
 <?php
+
 declare(strict_types=1);
+
 namespace MageOS\Blog\Controller\Search;
 
-/**
- * Blog search results view
- */
-class Index extends \MageOS\Blog\App\Action\Action
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\Forward;
+use Magento\Framework\Controller\Result\Redirect;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\View\Result\Page;
+use MageOS\Blog\Model\Config;
+
+class Index implements HttpGetActionInterface
 {
-    /**
-     * View blog search results action
-     *
-     * @return \Magento\Framework\Controller\ResultInterface
-     */
-    public function execute()
+    public function __construct(
+        private readonly ResultFactory $resultFactory,
+        private readonly RequestInterface $request,
+        private readonly Config $config
+    ) {
+    }
+
+    public function execute(): ResultInterface
     {
-        if (!$this->moduleEnabled()) {
-            return $this->_forwardNoroute();
+        if (!$this->config->isEnabled()) {
+            /** @var Forward $forward */
+            $forward = $this->resultFactory->create(ResultFactory::TYPE_FORWARD);
+            return $forward->forward('noroute');
         }
 
-        $resultPage = $this->_objectManager->get(\MageOS\Blog\Helper\Page::class)
-            ->prepareResultPage($this, new \Magento\Framework\DataObject());
-        return $resultPage;
+        $query = trim((string) $this->request->getParam('q', ''));
+        if ($query === '') {
+            /** @var Redirect $redirect */
+            $redirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+            return $redirect->setPath('blog');
+        }
+
+        /** @var Page $page */
+        $page = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
+        $page->getConfig()->getTitle()->set((string) __('Blog search — %1', $query));
+        return $page;
     }
 }

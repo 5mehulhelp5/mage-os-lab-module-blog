@@ -1,12 +1,16 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-
     <module name="MageOS_Blog">
-         <sequence>
+        <sequence>
+            <module name="Magento_UrlRewrite"/>
             <module name="Magento_Cms"/>
             <module name="Magento_Catalog"/>
-         </sequence>
+            <module name="Magento_Search"/>
+            <module name="Magento_Sitemap"/>
+            <module name="Magento_Widget"/>
+            <module name="Magento_GraphQl"/>
+            <module name="Magento_UrlRewriteGraphQl"/>
+        </sequence>
     </module>
-
 </config>

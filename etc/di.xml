@@ -1,20 +1,109 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-
-    <preference for="MageOS\Blog\Api\Data\BlogPostInterface" type="MageOS\Blog\Model\Post" />
-    <preference for="MageOS\Blog\Api\Data\BlogCategoryInterface" type="MageOS\Blog\Model\Category" />
-    <preference for="MageOS\Blog\Api\SitemapConfigInterface" type="MageOS\Blog\Model\Sitemap\SitemapConfig" />
-    <preference for="MageOS\Blog\Api\PostManagementInterface" type="MageOS\Blog\Model\PostManagement" />
-    <preference for="MageOS\Blog\Api\CategoryManagementInterface" type="MageOS\Blog\Model\CategoryManagement" />
-    <preference for="MageOS\Blog\Api\PostRepositoryInterface" type="MageOS\Blog\Model\PostRepository" />
-    <preference for="MageOS\Blog\Api\CategoryRepositoryInterface" type="MageOS\Blog\Model\CategoryRepository" />
-    <preference for="MageOS\Blog\Api\TagRepositoryInterface" type="MageOS\Blog\Model\TagRepository" />
-    <preference for="MageOS\Blog\Api\CommentRepositoryInterface" type="MageOS\Blog\Model\CommentRepository" />
-    <preference for="MageOS\Blog\Api\ShortContentExtractorInterface" type="MageOS\Blog\Model\ShortContentExtractor" />
-    <preference for="MageOS\Blog\Api\UrlResolverInterface" type="MageOS\Blog\Model\UrlResolver" />
-
-    <virtualType name="MageOS\Blog\ImageUpload" type="MageOS\Blog\Model\ImageUploader">
+    <preference for="MageOS\Blog\Api\Data\PostInterface"
+                type="MageOS\Blog\Model\Post"/>
+    <preference for="MageOS\Blog\Api\Data\CategoryInterface"
+                type="MageOS\Blog\Model\Category"/>
+    <preference for="MageOS\Blog\Api\Data\TagInterface"
+                type="MageOS\Blog\Model\Tag"/>
+    <preference for="MageOS\Blog\Api\Data\AuthorInterface"
+                type="MageOS\Blog\Model\Author"/>
+    <preference for="MageOS\Blog\Api\Data\PostSearchResultsInterface"
+                type="MageOS\Blog\Model\PostSearchResults"/>
+    <preference for="MageOS\Blog\Api\Data\CategorySearchResultsInterface"
+                type="MageOS\Blog\Model\CategorySearchResults"/>
+    <preference for="MageOS\Blog\Api\Data\TagSearchResultsInterface"
+                type="MageOS\Blog\Model\TagSearchResults"/>
+    <preference for="MageOS\Blog\Api\Data\AuthorSearchResultsInterface"
+                type="MageOS\Blog\Model\AuthorSearchResults"/>
+    <preference for="MageOS\Blog\Api\AuthorRepositoryInterface"
+                type="MageOS\Blog\Model\AuthorRepository"/>
+    <preference for="MageOS\Blog\Api\CategoryRepositoryInterface"
+                type="MageOS\Blog\Model\CategoryRepository"/>
+    <preference for="MageOS\Blog\Api\HyvaThemeDetectionInterface"
+                type="MageOS\Blog\Model\HyvaThemeDetection"/>
+    <preference for="MageOS\Blog\Api\PostRepositoryInterface"
+                type="MageOS\Blog\Model\PostRepository"/>
+    <preference for="MageOS\Blog\Api\TagRepositoryInterface"
+                type="MageOS\Blog\Model\TagRepository"/>
+    <preference for="MageOS\Blog\Api\UrlKeyGeneratorInterface"
+                type="MageOS\Blog\Model\UrlKeyGenerator"/>
+    <preference for="MageOS\Blog\Api\PostManagementInterface"
+                type="MageOS\Blog\Model\PostManagement"/>
+    <preference for="MageOS\Blog\Api\RelatedPostsProviderInterface"
+                type="MageOS\Blog\Model\RelatedPostsProvider"/>
+    <preference for="MageOS\Blog\Model\UrlKeyGenerator\CollisionChecker"
+                type="MageOS\Blog\Model\UrlKeyGenerator\DbCollisionChecker"/>
+    <virtualType name="MageOS\Blog\Model\ResourceModel\Post\Grid\Collection"
+                 type="MageOS\Blog\Ui\DataProvider\Post\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">mageos_blog_post</argument>
+            <argument name="resourceModel" xsi:type="string">MageOS\Blog\Model\ResourceModel\Post</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MageOS\Blog\Model\ResourceModel\Category\Grid\Collection"
+                 type="MageOS\Blog\Ui\DataProvider\Category\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">mageos_blog_category</argument>
+            <argument name="resourceModel" xsi:type="string">MageOS\Blog\Model\ResourceModel\Category</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MageOS\Blog\Model\ResourceModel\Tag\Grid\Collection"
+                 type="MageOS\Blog\Ui\DataProvider\Tag\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">mageos_blog_tag</argument>
+            <argument name="resourceModel" xsi:type="string">MageOS\Blog\Model\ResourceModel\Tag</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MageOS\Blog\Model\ResourceModel\Author\Grid\Collection"
+                 type="MageOS\Blog\Ui\DataProvider\Author\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">mageos_blog_author</argument>
+            <argument name="resourceModel" xsi:type="string">MageOS\Blog\Model\ResourceModel\Author</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="mageos_blog_post_listing_data_source" xsi:type="string">MageOS\Blog\Model\ResourceModel\Post\Grid\Collection</item>
+                <item name="mageos_blog_category_listing_data_source" xsi:type="string">MageOS\Blog\Model\ResourceModel\Category\Grid\Collection</item>
+                <item name="mageos_blog_tag_listing_data_source" xsi:type="string">MageOS\Blog\Model\ResourceModel\Tag\Grid\Collection</item>
+                <item name="mageos_blog_author_listing_data_source" xsi:type="string">MageOS\Blog\Model\ResourceModel\Author\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\Blog\Ui\DataProvider\Post\Form\DataProvider">
+        <arguments>
+            <argument name="imageUploader" xsi:type="object">MageOS\Blog\PostImageUpload</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\Blog\Ui\DataProvider\Author\Form\DataProvider">
+        <arguments>
+            <argument name="imageUploader" xsi:type="object">MageOS\Blog\AuthorImageUpload</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\Blog\Controller\Adminhtml\Post\Save">
+        <arguments>
+            <argument name="imageUploader" xsi:type="object">MageOS\Blog\PostImageUpload</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\Blog\Controller\Adminhtml\Author\Save">
+        <arguments>
+            <argument name="imageUploader" xsi:type="object">MageOS\Blog\AuthorImageUpload</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\Blog\Controller\Adminhtml\Post\UploadImage">
+        <arguments>
+            <argument name="imageUploader" xsi:type="object">MageOS\Blog\PostImageUpload</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\Blog\Controller\Adminhtml\Author\UploadImage">
+        <arguments>
+            <argument name="imageUploader" xsi:type="object">MageOS\Blog\AuthorImageUpload</argument>
+        </arguments>
+    </type>
+    <virtualType name="MageOS\Blog\PostImageUpload" type="MageOS\Blog\Model\ImageUploader">
         <arguments>
             <argument name="baseTmpPath" xsi:type="string">mageos_blog/tmp</argument>
             <argument name="basePath" xsi:type="string">mageos_blog</argument>
@@ -23,93 +112,56 @@
                 <item name="jpeg" xsi:type="string">jpeg</item>
                 <item name="gif" xsi:type="string">gif</item>
                 <item name="png" xsi:type="string">png</item>
+                <item name="webp" xsi:type="string">webp</item>
+                <item name="svg" xsi:type="string">svg</item>
             </argument>
         </arguments>
     </virtualType>
-
-    <type name="MageOS\Blog\Controller\Adminhtml\Post\Upload\FeaturedImg">
-        <arguments>
-            <argument name="imageUploader" xsi:type="object">MageOS\Blog\ImageUpload</argument>
-        </arguments>
-    </type>
-    <type name="MageOS\Blog\Controller\Adminhtml\Post\Upload\OgImg">
-        <arguments>
-            <argument name="imageUploader" xsi:type="object">MageOS\Blog\ImageUpload</argument>
-        </arguments>
-    </type>
-    <type name="MageOS\Blog\Controller\Adminhtml\Post\Upload\Gallery">
-        <arguments>
-            <argument name="imageUploader" xsi:type="object">MageOS\Blog\ImageUpload</argument>
-        </arguments>
-    </type>
-
-    <type name="Magento\AdminGws\Model\Models">
-        <plugin name="blog_plugin_admingws_model_models_plugin"
-                type="\MageOS\Blog\Plugin\Magento\AdminGws\Model\ModelsPlugin"
+    <type name="MageOS\Blog\Api\PostRepositoryInterface">
+        <plugin name="mageos_blog_post_url_rewrite"
+                type="MageOS\Blog\Plugin\Repository\Post\UrlRewritePlugin"
                 sortOrder="10"/>
     </type>
-
-    <virtualType name="MageOS\Blog\Block\Widget\PostLink" type="MageOS\Blog\Block\Widget\Link">
-        <arguments>
-            <argument name="modelRepository" xsi:type="object">MageOS\Blog\Api\PostRepositoryInterface</argument>
-        </arguments>
-    </virtualType>
-    <virtualType name="MageOS\Blog\Block\Widget\CategoryLink" type="MageOS\Blog\Block\Widget\Link">
-        <arguments>
-            <argument name="modelRepository" xsi:type="object">MageOS\Blog\Api\CategoryRepositoryInterface</argument>
-        </arguments>
-    </virtualType>
-    <virtualType name="MageOS\Blog\Block\Widget\TagLink" type="MageOS\Blog\Block\Widget\Link">
-        <arguments>
-            <argument name="modelRepository" xsi:type="object">MageOS\Blog\Api\TagRepositoryInterface</argument>
-        </arguments>
-    </virtualType>
-
-
-    <type name="Magento\PageBuilder\Model\UpgradableEntitiesPool">
-        <arguments>
-            <argument name="entities" xsi:type="array">
-                <item name="blog_post" xsi:type="array">
-                    <item name="identifier" xsi:type="string">post_id</item>
-                    <item name="fields" xsi:type="array">
-                        <item name="content" xsi:type="boolean">true</item>
-                        <item name="short_content" xsi:type="boolean">true</item>
-                    </item>
-                </item>
-                <item name="blog_category" xsi:type="array">
-                    <item name="identifier" xsi:type="string">category_id</item>
-                    <item name="fields" xsi:type="array">
-                        <item name="content" xsi:type="boolean">true</item>
-                    </item>
-                </item>
-                <item name="blog_tag" xsi:type="array">
-                    <item name="identifier" xsi:type="string">tag_id</item>
-                    <item name="fields" xsi:type="array">
-                        <item name="content" xsi:type="boolean">true</item>
-                    </item>
-                </item>
-            </argument>
-        </arguments>
+    <type name="MageOS\Blog\Api\CategoryRepositoryInterface">
+        <plugin name="mageos_blog_category_url_rewrite"
+                type="MageOS\Blog\Plugin\Repository\Category\UrlRewritePlugin"
+                sortOrder="10"/>
     </type>
-
+    <type name="MageOS\Blog\Api\TagRepositoryInterface">
+        <plugin name="mageos_blog_tag_url_rewrite"
+                type="MageOS\Blog\Plugin\Repository\Tag\UrlRewritePlugin"
+                sortOrder="10"/>
+    </type>
+    <type name="MageOS\Blog\Api\AuthorRepositoryInterface">
+        <plugin name="mageos_blog_author_url_rewrite"
+                type="MageOS\Blog\Plugin\Repository\Author\UrlRewritePlugin"
+                sortOrder="10"/>
+    </type>
+    <type name="Magento\Framework\View\TemplateEngine\Php">
+        <plugin name="mageos_blog_hyva_template_swap"
+                type="MageOS\Blog\Plugin\Magento\Framework\View\TemplateEngine\Php"
+                sortOrder="10"/>
+    </type>
     <type name="Magento\Sitemap\Model\ItemProvider\Composite">
         <arguments>
             <argument name="itemProviders" xsi:type="array">
-                <item name="mageos_blogIndexUrlProvider" xsi:type="object">MageOS\Blog\Model\Sitemap\ItemProvider\Index</item>
-                <item name="mageos_blogPostProvider" xsi:type="object">MageOS\Blog\Model\Sitemap\ItemProvider\Post</item>
-                <item name="mageos_blogCategoryProvider" xsi:type="object">MageOS\Blog\Model\Sitemap\ItemProvider\Category</item>
+                <item name="mageos_blog_posts" xsi:type="object">MageOS\Blog\Model\Sitemap\ItemProvider\Post</item>
+                <item name="mageos_blog_categories" xsi:type="object">MageOS\Blog\Model\Sitemap\ItemProvider\Category</item>
+                <item name="mageos_blog_tags" xsi:type="object">MageOS\Blog\Model\Sitemap\ItemProvider\Tag</item>
             </argument>
         </arguments>
     </type>
-
-
-
-    <preference for="MageOS\Blog\Api\HyvaThemeDetectionInterface" type="MageOS\Blog\Model\HyvaThemeDetection"/>
-
-    <type name="Magento\Framework\View\TemplateEngine\Php">
-        <plugin name="MageOS_Blog_Plugin_Magento_Framework_View_TemplateEngine_Php"
-                type="MageOS\Blog\Plugin\Magento\Framework\View\TemplateEngine\Php"
-                sortOrder="10" disabled="false"/>
-    </type>
-
+    <virtualType name="MageOS\Blog\AuthorImageUpload" type="MageOS\Blog\Model\ImageUploader">
+        <arguments>
+            <argument name="baseTmpPath" xsi:type="string">mageos_blog/author/tmp</argument>
+            <argument name="basePath" xsi:type="string">mageos_blog/author</argument>
+            <argument name="allowedExtensions" xsi:type="array">
+                <item name="jpg" xsi:type="string">jpg</item>
+                <item name="jpeg" xsi:type="string">jpeg</item>
+                <item name="gif" xsi:type="string">gif</item>
+                <item name="png" xsi:type="string">png</item>
+                <item name="webp" xsi:type="string">webp</item>
+            </argument>
+        </arguments>
+    </virtualType>
 </config>

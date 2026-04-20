@@ -1,90 +1,66 @@
 <?php
+
 declare(strict_types=1);
+
 namespace MageOS\Blog\Controller\Category;
 
-/**
- * Blog category view
- */
-class View extends \MageOS\Blog\App\Action\Action
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\Forward;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Registry;
+use Magento\Framework\View\Result\Page;
+use MageOS\Blog\Api\CategoryRepositoryInterface;
+use MageOS\Blog\Model\Config;
+
+class View implements HttpGetActionInterface
 {
-    /**
-     * Store manager
-     *
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
-    protected $_storeManager;
+    public const REGISTRY_KEY = 'current_blog_category';
 
-    /**
-     * @var \MageOS\Blog\Model\Url
-     */
-    protected $url;
-
-    /**
-     * View constructor.
-     * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \MageOS\Blog\Model\Url|null $url
-     */
     public function __construct(
-        \Magento\Framework\App\Action\Context $context,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \MageOS\Blog\Model\Url $url = null
+        private readonly ResultFactory $resultFactory,
+        private readonly RequestInterface $request,
+        private readonly Config $config,
+        private readonly CategoryRepositoryInterface $repository,
+        private readonly Registry $registry
     ) {
-        parent::__construct($context);
-        $this->_storeManager = $storeManager;
-        $this->url = $url ?: $this->_objectManager->get(\MageOS\Blog\Model\Url::class);
     }
 
-    /**
-     * View blog category action
-     *
-     * @return \Magento\Framework\Controller\ResultInterface
-     */
-    public function execute()
+    public function execute(): ResultInterface
     {
-        if (!$this->moduleEnabled()) {
-            return $this->_forwardNoroute();
+        if (!$this->config->isEnabled()) {
+            return $this->notFound();
         }
 
-        $category = $this->_initCategory();
-
-        if (!$category) {
-            $resultRedirect = $this->resultRedirectFactory->create();
-            $resultRedirect->setHttpResponseCode(301);
-            $resultRedirect->setPath($this->url->getBaseUrl());
-            return $resultRedirect;
+        $categoryId = (int) $this->request->getParam('id');
+        if ($categoryId <= 0) {
+            return $this->notFound();
         }
 
-        $this->_objectManager->get(\Magento\Framework\Registry::class)
-            ->register('current_blog_category', $category);
+        try {
+            $category = $this->repository->getById($categoryId);
+        } catch (NoSuchEntityException) {
+            return $this->notFound();
+        }
 
-        $resultPage = $this->_objectManager->get(\MageOS\Blog\Helper\Page::class)
-            ->prepareResultPage($this, $category);
-        return $resultPage;
+        if (!$category->getIsActive()) {
+            return $this->notFound();
+        }
+
+        $this->registry->register(self::REGISTRY_KEY, $category);
+
+        /** @var Page $page */
+        $page = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
+        $page->getConfig()->getTitle()->set((string) ($category->getMetaTitle() ?: $category->getTitle()));
+        return $page;
     }
 
-    /**
-     * Init category
-     *
-     * @return \MageOS\Blog\Model\category || false
-     */
-    protected function _initCategory()
+    private function notFound(): Forward
     {
-        $id = (int)$this->getRequest()->getParam('id');
-        if (!$id) {
-            return false;
-        }
-
-        $storeId = (int)$this->_storeManager->getStore()->getId();
-
-        $category = $this->_objectManager->create(\MageOS\Blog\Model\Category::class)->load($id);
-
-        if (!$category->isVisibleOnStore($storeId)) {
-            return false;
-        }
-
-        $category->setStoreId($storeId);
-
-        return $category;
+        /** @var Forward $forward */
+        $forward = $this->resultFactory->create(ResultFactory::TYPE_FORWARD);
+        return $forward->forward('noroute');
     }
 }

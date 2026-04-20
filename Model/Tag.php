@@ -1,283 +1,127 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOS\Blog\Model;
 
-use MageOS\Blog\Model\Url;
-use MageOS\Blog\Api\ShortContentExtractorInterface;
+use Magento\Framework\DataObject\IdentityInterface;
+use Magento\Framework\Model\AbstractExtensibleModel;
+use MageOS\Blog\Api\Data\TagExtensionInterface;
+use MageOS\Blog\Api\Data\TagInterface;
+use MageOS\Blog\Model\ResourceModel\Tag as TagResource;
 
-/**
- * Tag model
- *
- * @method \MageOS\Blog\Model\ResourceModel\Tag _getResource()
- * @method \MageOS\Blog\Model\ResourceModel\Tag getResource()
- * @method string getTitle()
- * @method $this setTitle(string $value)
- * @method $this setIdentifier(string $value)
- */
-class Tag extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
+class Tag extends AbstractExtensibleModel implements TagInterface, IdentityInterface
 {
-    /**
-     * Tag Status
-     */
-    const STATUS_ENABLED = 1;
+    public const CACHE_TAG = 'mageos_blog_tag';
 
-    /**
-     * blog cache tag
-     */
-    const CACHE_TAG = 'rb_t';
+    protected $_eventPrefix = 'mageos_blog_tag';
+    protected $_eventObject = 'tag';
 
-    /**
-     * Prefix of model events names
-     *
-     * @var string
-     */
-    protected $_eventPrefix = 'blog_tag';
-
-    /**
-     * Parameter name in event
-     *
-     * In observe method you can use $observer->getEvent()->getObject() in this case
-     *
-     * @var string
-     */
-    protected $_eventObject = 'blog_tag';
-
-    /**
-     * @var \Magento\Framework\UrlInterface
-     */
-    protected $_url;
-
-    /**
-     * @var string
-     */
-    protected $controllerName;
-
-    /**
-     * @var ShortContentExtractorInterface
-     */
-    protected $shortContentExtractor;
-
-    /**
-     * Initialize dependencies.
-     *
-     * @param \Magento\Framework\Model\Context $context
-     * @param \Magento\Framework\Registry $registry
-     * @param \MageOS\Blog\Model\Url $url
-     * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
-     * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
-     * @param array $data
-     */
-    public function __construct(
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        Url $url,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        array $data = []
-    ) {
-        $this->_url = $url;
-        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
-    }
-
-    /**
-     * Initialize resource model
-     *
-     * @return void
-     */
-    protected function _construct()
+    protected function _construct(): void
     {
-        $this->_init(\MageOS\Blog\Model\ResourceModel\Tag::class);
-        $this->controllerName = URL::CONTROLLER_TAG;
+        $this->_init(TagResource::class);
     }
 
-    /**
-     * Retrieve true if tag is active
-     * @return boolean
-     */
-    public function isActive()
-    {
-        return ($this->getIsActive() == self::STATUS_ENABLED);
-    }
-
-    /**
-     * Retrieve if is visible on store
-     * @return bool
-     */
-    public function isVisibleOnStore($storeId)
-    {
-        return $this->getIsActive()
-            && (null === $storeId || array_intersect([0, $storeId], $this->getStoreIds()));
-    }
-
-    /**
-     * Retrieve model title
-     * @param  boolean $plural
-     * @return string
-     */
-    public function getOwnTitle($plural = false)
-    {
-        return $plural ? 'Tags' : 'Tag';
-    }
-
-    /**
-     * Check if tag identifier exist for specific store
-     * return tag id if tag exists
-     *
-     * @param string $identifier
-     * @param int $storeId
-     * @return int
-     */
-    public function checkIdentifier($identifier, $storeId)
-    {
-        return $this->_getResource()->checkIdentifier($identifier, $storeId);
-    }
-
-    /**
-     * Retrieve catgegory url route path
-     * @return string
-     */
-    public function getUrl()
-    {
-        return $this->_url->getUrlPath($this, URL::CONTROLLER_TAG);
-    }
-
-    /**
-     * Retrieve tag url
-     * @return string
-     */
-    public function getTagUrl()
-    {
-        $url = $this->getData('tag_url');
-        if (!$url) {
-            $url = $this->_url->getUrl($this, URL::CONTROLLER_TAG);
-            $this->setData('tag_url', $url);
-        }
-
-        return $url;
-    }
-
-    /**
-     * Retrieve meta title
-     * @return string
-     */
-    public function getMetaTitle()
-    {
-        $title = $this->getData('meta_title');
-        if (!$title) {
-            $title = $this->getData('title');
-        }
-
-        return trim($title ?: '');
-    }
-
-    /**
-     * Retrieve meta description
-     * @return string
-     */
-    public function getMetaDescription()
-    {
-        $desc = $this->getData('meta_description');
-        if (!$desc) {
-            $desc = $this->getShortContentExtractor()->execute($this->getData('content'), 250);
-        }
-
-        $stylePattern = "~\<style(.*)\>(.*)\<\/style\>~";
-        $desc = preg_replace($stylePattern, '', $desc);
-        $desc = trim(strip_tags((string)$desc));
-        $desc = str_replace(["\r\n", "\n\r", "\r", "\n"], ' ', $desc);
-
-        if (mb_strlen($desc) > 200) {
-            $desc = mb_substr($desc, 0, 200);
-        }
-
-        return trim($desc);
-    }
-
-    /**
-     * Retrieve identities
-     *
-     * @return array
-     */
-    public function getIdentities()
+    public function getIdentities(): array
     {
         return [self::CACHE_TAG . '_' . $this->getId()];
     }
 
-    /**
-     * Retrieve block identifier
-     *
-     * @return string
-     */
-    public function getIdentifier()
+    public function getTagId(): ?int
     {
-        return (string)$this->getData('identifier');
+        $value = $this->getData(self::TAG_ID);
+        return $value === null ? null : (int) $value;
     }
 
-    /**
-     * Retrieve controller name
-     * @return string
-     */
-    public function getControllerName()
+    public function setTagId(int $id): self
     {
-        return $this->controllerName;
+        return $this->setData(self::TAG_ID, $id);
     }
 
-    /**
-     * @deprecated use getDynamicData method in graphQL data provider
-     * Return all additional data
-     * @return array
-     */
-    public function getDynamicData()
+    public function getUrlKey(): string
     {
-        $data = $this->getData();
-
-        $keys = [
-            'meta_description',
-            'meta_title',
-            'tag_url',
-        ];
-
-        foreach ($keys as $key) {
-            $method = 'get' . str_replace(
-                '_',
-                '',
-                ucwords($key, '_')
-            );
-            $data[$key] = $this->$method();
-        }
-
-        return $data;
+        return (string) $this->getData(self::URL_KEY);
     }
 
-    /**
-     * @return ShortContentExtractorInterface
-     */
-    public function getShortContentExtractor()
+    public function setUrlKey(string $urlKey): self
     {
-        if (null === $this->shortContentExtractor) {
-            $this->shortContentExtractor = \Magento\Framework\App\ObjectManager::getInstance()
-                ->get(ShortContentExtractorInterface::class);
-        }
-
-        return $this->shortContentExtractor;
+        return $this->setData(self::URL_KEY, $urlKey);
     }
 
-    /**
-     * @return array|mixed|null
-     */
-    public function getTagImage()
+    public function getTitle(): string
     {
-        if (!$this->hasData('tag_image')) {
-            if ($file = $this->getData('tag_img')) {
-                $image = $this->_url->getMediaUrl($file);
+        return (string) $this->getData(self::TITLE);
+    }
 
-            } else {
-                $image = false;
-            }
-            $this->setData('tag_image', $image);
-        }
+    public function setTitle(string $title): self
+    {
+        return $this->setData(self::TITLE, $title);
+    }
 
-        return $this->getData('tag_image');
+    public function getDescription(): ?string
+    {
+        $value = $this->getData(self::DESCRIPTION);
+        return $value === null ? null : (string) $value;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        return $this->setData(self::DESCRIPTION, $description);
+    }
+
+    public function getMetaTitle(): ?string
+    {
+        $value = $this->getData(self::META_TITLE);
+        return $value === null ? null : (string) $value;
+    }
+
+    public function setMetaTitle(?string $title): self
+    {
+        return $this->setData(self::META_TITLE, $title);
+    }
+
+    public function getMetaDescription(): ?string
+    {
+        $value = $this->getData(self::META_DESCRIPTION);
+        return $value === null ? null : (string) $value;
+    }
+
+    public function setMetaDescription(?string $desc): self
+    {
+        return $this->setData(self::META_DESCRIPTION, $desc);
+    }
+
+    public function getIsActive(): bool
+    {
+        return (bool) $this->getData(self::IS_ACTIVE);
+    }
+
+    public function setIsActive(bool $flag): self
+    {
+        return $this->setData(self::IS_ACTIVE, $flag);
+    }
+
+    public function getStoreIds(): array
+    {
+        $ids = $this->getData(self::STORE_IDS);
+        return \is_array($ids) ? array_map('intval', $ids) : [];
+    }
+
+    public function setStoreIds(array $storeIds): self
+    {
+        return $this->setData(self::STORE_IDS, array_map('intval', $storeIds));
+    }
+
+    public function getExtensionAttributes(): ?TagExtensionInterface
+    {
+        /** @var ?TagExtensionInterface $value */
+        $value = $this->_getExtensionAttributes();
+
+        return $value;
+    }
+
+    public function setExtensionAttributes(TagExtensionInterface $extensionAttributes): self
+    {
+        return $this->_setExtensionAttributes($extensionAttributes);
     }
 }
