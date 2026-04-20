@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MageOS\Blog\Ui\DataProvider\Category\Form;
 
 use Magento\Framework\App\RequestInterface;
-use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use MageOS\Blog\Model\ResourceModel\Category\CollectionFactory;
 
@@ -26,7 +25,6 @@ class DataProvider extends AbstractDataProvider
         string $requestFieldName,
         CollectionFactory $collectionFactory,
         private readonly RequestInterface $request,
-        private readonly UrlInterface $urlBuilder,
         array $meta = [],
         array $data = []
     ) {
