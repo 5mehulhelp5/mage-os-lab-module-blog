@@ -72,6 +72,11 @@
             <argument name="imageUploader" xsi:type="object">MageOS\Blog\PostImageUpload</argument>
         </arguments>
     </type>
+    <type name="MageOS\Blog\Ui\DataProvider\Author\Form\DataProvider">
+        <arguments>
+            <argument name="imageUploader" xsi:type="object">MageOS\Blog\AuthorImageUpload</argument>
+        </arguments>
+    </type>
     <type name="MageOS\Blog\Controller\Adminhtml\Post\Save">
         <arguments>
             <argument name="imageUploader" xsi:type="object">MageOS\Blog\PostImageUpload</argument>
