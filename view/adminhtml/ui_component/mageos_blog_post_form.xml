@@ -336,13 +336,45 @@
                 </select>
             </formElements>
         </field>
-        <field name="related_product_ids" formElement="input" sortOrder="20">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Related Product IDs (comma-separated)</label>
-                <dataScope>related_product_ids</dataScope>
-            </settings>
-        </field>
+        <container name="related_product_ids_container" sortOrder="20">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Related Products</item>
+                </item>
+            </argument>
+            <insertListing name="related_product_ids_listing"
+                           sortOrder="10"
+                           component="Magento_Ui/js/form/components/insert-listing">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="autoRender" xsi:type="boolean">true</item>
+                        <item name="dataScope" xsi:type="string">related_product_ids</item>
+                        <item name="externalProvider" xsi:type="string">product_listing.product_listing_data_source</item>
+                        <item name="selectionsProvider" xsi:type="string">product_listing.product_listing.product_columns.ids</item>
+                        <item name="ns" xsi:type="string">product_listing</item>
+                        <item name="render_url" xsi:type="url" path="mui/index/render"/>
+                        <item name="realTimeLink" xsi:type="boolean">true</item>
+                        <item name="behaviourType" xsi:type="string">simple</item>
+                        <item name="externalFilterMode" xsi:type="boolean">true</item>
+                        <item name="imports" xsi:type="array">
+                            <item name="productIds" xsi:type="string">${ $.provider }:${ $.dataProvider }</item>
+                        </item>
+                        <item name="exports" xsi:type="array">
+                            <item name="productIds" xsi:type="string">${ $.provider }:${ $.dataProvider }</item>
+                        </item>
+                    </item>
+                </argument>
+                <settings>
+                    <dataLinks>
+                        <exports>true</exports>
+                        <imports>true</imports>
+                    </dataLinks>
+                    <listens>
+                        <link name="${ $.externalProvider }:params.filters">evaluateExternalFilters</link>
+                    </listens>
+                </settings>
+            </insertListing>
+        </container>
     </fieldset>
 
     <fieldset name="stores" sortOrder="70">
