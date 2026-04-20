@@ -14,10 +14,10 @@ use MageOS\Blog\Api\Data\TagInterface;
 
 class UrlRewriteBuilder
 {
-    public const ENTITY_TYPE_POST = 'mageos_blog_post';
-    public const ENTITY_TYPE_CATEGORY = 'mageos_blog_category';
-    public const ENTITY_TYPE_TAG = 'mageos_blog_tag';
-    public const ENTITY_TYPE_AUTHOR = 'mageos_blog_author';
+    public const ENTITY_TYPE_POST = 'blog_post';
+    public const ENTITY_TYPE_CATEGORY = 'blog_category';
+    public const ENTITY_TYPE_TAG = 'blog_tag';
+    public const ENTITY_TYPE_AUTHOR = 'blog_author';
 
     public function __construct(
         private readonly UrlRewriteFactory $urlRewriteFactory,
