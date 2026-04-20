@@ -12,11 +12,7 @@ bin/magento setup:di:compile
 bin/magento cache:clean
 ```
 
-For Hyvä storefronts, also install the companion template package:
-
-```bash
-composer require mageos/module-blog-hyva
-```
+For Hyvä storefronts, a template companion (`mageos/module-blog-hyva`) is planned for v1.1; v1.0 renders Luma templates on Hyvä via graceful fallback.
 
 ## Enable
 
@@ -60,7 +56,7 @@ By default:
 - RSS: `/blog/rss`
 - Search: `/blog/search?q=...`
 
-URL shape is driven by `mageos_blog/permalink/*` config. URL rewrites populate on save via the repository plugins in `Plugin/Repository/`.
+URL rewrites are populated on save by the repository plugins in `Plugin/Repository/`. The router (`Controller/Router.php`) delegates path parsing to `MageOS\Blog\Model\UrlResolver`.
 
 ## GraphQL
 
@@ -84,14 +80,14 @@ vendor/bin/phpunit --testsuite unit
 vendor/bin/phpstan analyse --memory-limit=1G
 vendor/bin/phpcs --standard=phpcs.xml.dist
 vendor/bin/php-cs-fixer fix --dry-run --diff
-vendor/bin/infection --min-msi=75 --threads=4
+XDEBUG_MODE=coverage vendor/bin/infection --threads=4
 ```
 
 Integration tests live under `Test/Integration/` and run in CI against a live Magento install via `graycoreio/github-actions-magento2`.
 
 ## Contributing
 
-Issues and PRs welcome at https://github.com/mage-os/module-blog. Please follow [Conventional Commits](https://www.conventionalcommits.org/), include tests for new behavior, and keep PRs small and reviewable.
+Issues and PRs welcome at https://github.com/mage-os-lab/module-blog. Please follow [Conventional Commits](https://www.conventionalcommits.org/), include tests for new behavior, and keep PRs small and reviewable.
 
 ## License
 
