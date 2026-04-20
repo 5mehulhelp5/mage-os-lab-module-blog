@@ -10,13 +10,13 @@
     <preference for="MageOS\Blog\Api\Data\AuthorInterface"
                 type="MageOS\Blog\Model\Author"/>
     <preference for="MageOS\Blog\Api\Data\PostSearchResultsInterface"
-                type="Magento\Framework\Api\SearchResults"/>
+                type="MageOS\Blog\Model\PostSearchResults"/>
     <preference for="MageOS\Blog\Api\Data\CategorySearchResultsInterface"
-                type="Magento\Framework\Api\SearchResults"/>
+                type="MageOS\Blog\Model\CategorySearchResults"/>
     <preference for="MageOS\Blog\Api\Data\TagSearchResultsInterface"
-                type="Magento\Framework\Api\SearchResults"/>
+                type="MageOS\Blog\Model\TagSearchResults"/>
     <preference for="MageOS\Blog\Api\Data\AuthorSearchResultsInterface"
-                type="Magento\Framework\Api\SearchResults"/>
+                type="MageOS\Blog\Model\AuthorSearchResults"/>
     <preference for="MageOS\Blog\Api\AuthorRepositoryInterface"
                 type="MageOS\Blog\Model\AuthorRepository"/>
     <preference for="MageOS\Blog\Api\CategoryRepositoryInterface"
