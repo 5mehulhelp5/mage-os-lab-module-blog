@@ -115,6 +115,8 @@ class Save extends Action implements HttpPostActionInterface
         $post->setStoreIds($this->parseIdList($data['store_ids'] ?? []));
         $post->setCategoryIds($this->parseIdList($data['category_ids'] ?? []));
         $post->setTagIds($this->parseIdList($data['tag_ids'] ?? []));
+        $post->setRelatedPostIds($this->parseIdList($data['related_post_ids'] ?? []));
+        $post->setRelatedProductIds($this->parseIdList($data['related_product_ids'] ?? []));
 
         foreach (['featured_image', 'og_image'] as $field) {
             $raw = $data[$field] ?? null;

@@ -16,6 +16,8 @@ use MageOS\Blog\Api\Data\PostSearchResultsInterfaceFactory;
 use MageOS\Blog\Api\PostRepositoryInterface;
 use MageOS\Blog\Api\UrlKeyGeneratorInterface;
 use MageOS\Blog\Model\Post\Link\CategoryLinkManager;
+use MageOS\Blog\Model\Post\Link\RelatedPostLinkManager;
+use MageOS\Blog\Model\Post\Link\RelatedProductLinkManager;
 use MageOS\Blog\Model\Post\Link\StoreLinkManager;
 use MageOS\Blog\Model\Post\Link\TagLinkManager;
 use MageOS\Blog\Model\ResourceModel\Post as PostResource;
@@ -32,6 +34,8 @@ class PostRepository implements PostRepositoryInterface
         private readonly StoreLinkManager $storeLinks,
         private readonly CategoryLinkManager $categoryLinks,
         private readonly TagLinkManager $tagLinks,
+        private readonly RelatedPostLinkManager $relatedPostLinks,
+        private readonly RelatedProductLinkManager $relatedProductLinks,
         private readonly UrlKeyGeneratorInterface $urlKeyGenerator,
     ) {
     }
@@ -63,6 +67,8 @@ class PostRepository implements PostRepositoryInterface
         $this->storeLinks->sync($postId, $post->getStoreIds());
         $this->categoryLinks->sync($postId, $post->getCategoryIds());
         $this->tagLinks->sync($postId, $post->getTagIds());
+        $this->relatedPostLinks->sync($postId, $post->getRelatedPostIds());
+        $this->relatedProductLinks->sync($postId, $post->getRelatedProductIds());
 
         return $this->getById($postId);
     }
@@ -144,5 +150,7 @@ class PostRepository implements PostRepositoryInterface
         $post->setStoreIds($this->storeLinks->getLinkedIds($id));
         $post->setCategoryIds($this->categoryLinks->getLinkedIds($id));
         $post->setTagIds($this->tagLinks->getLinkedIds($id));
+        $post->setRelatedPostIds($this->relatedPostLinks->getLinkedIds($id));
+        $post->setRelatedProductIds($this->relatedProductLinks->getLinkedIds($id));
     }
 }
