@@ -75,13 +75,20 @@
                 </select>
             </formElements>
         </field>
-        <field name="parent_id" formElement="input" sortOrder="40">
+        <field name="parent_id" formElement="select" sortOrder="40">
             <settings>
-                <dataType>number</dataType>
-                <label translate="true">Parent ID</label>
+                <dataType>text</dataType>
+                <label translate="true">Parent Category</label>
                 <dataScope>parent_id</dataScope>
-                <notice translate="true">Root category: leave blank. Tree chooser lands in a later task.</notice>
+                <notice translate="true">Pick a parent category or leave as "None (Root)" to create a top-level category.</notice>
             </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="MageOS\Blog\Ui\Component\Form\ParentCategory\Options"/>
+                    </settings>
+                </select>
+            </formElements>
         </field>
         <field name="position" formElement="input" sortOrder="50">
             <settings>
