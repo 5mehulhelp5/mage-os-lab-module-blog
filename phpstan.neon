@@ -6,6 +6,7 @@ parameters:
         - Api
         - Block
         - Controller
+        - Cron
         - Model
         - Plugin
         - Ui

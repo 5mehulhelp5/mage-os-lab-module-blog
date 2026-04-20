@@ -4,6 +4,7 @@
     <file>Api</file>
     <file>Block</file>
     <file>Controller</file>
+    <file>Cron</file>
     <file>Model</file>
     <file>Plugin</file>
     <file>Ui</file>
