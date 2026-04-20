@@ -1,0 +1,357 @@
+# MageOS Blog — GraphQL schema
+
+type Query {
+    blogPost(
+        id: Int @doc(description: "The ID of the blog post.")
+        url_key: String @doc(description: "The URL key of the blog post.")
+    ): BlogPost @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Post\\DetailResolver") @doc(description: "Return a single blog post by ID or URL key.")
+
+    blogPosts(
+        filter: BlogPostFilterInput
+        sort: BlogPostSortInput
+        pageSize: Int = 20
+        currentPage: Int = 1
+    ): BlogPosts @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Post\\ListResolver") @doc(description: "Return a paginated list of blog posts.")
+
+    blogCategory(
+        id: Int @doc(description: "The ID of the blog category.")
+        url_key: String @doc(description: "The URL key of the blog category.")
+    ): BlogCategory @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Category\\DetailResolver") @doc(description: "Return a single blog category by ID or URL key.")
+
+    blogCategories(
+        filter: BlogCategoryFilterInput
+        sort: BlogCategorySortInput
+        pageSize: Int = 20
+        currentPage: Int = 1
+    ): BlogCategories @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Category\\ListResolver") @doc(description: "Return a paginated list of blog categories.")
+
+    blogTag(
+        id: Int @doc(description: "The ID of the blog tag.")
+        url_key: String @doc(description: "The URL key of the blog tag.")
+    ): BlogTag @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Tag\\DetailResolver") @doc(description: "Return a single blog tag by ID or URL key.")
+
+    blogTags(
+        filter: BlogTagFilterInput
+        sort: BlogTagSortInput
+        pageSize: Int = 20
+        currentPage: Int = 1
+    ): BlogTags @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Tag\\ListResolver") @doc(description: "Return a paginated list of blog tags.")
+
+    blogAuthor(
+        id: Int @doc(description: "The ID of the blog author.")
+        slug: String @doc(description: "The slug of the blog author.")
+    ): BlogAuthor @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Author\\DetailResolver") @doc(description: "Return a single blog author by ID or slug.")
+
+    blogAuthors(
+        filter: BlogAuthorFilterInput
+        sort: BlogAuthorSortInput
+        pageSize: Int = 20
+        currentPage: Int = 1
+    ): BlogAuthors @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Author\\ListResolver") @doc(description: "Return a paginated list of blog authors.")
+}
+
+type Mutation {
+    createBlogPost(input: BlogPostCreateInput!): BlogPost @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Post\\CreateResolver") @doc(description: "Create a new blog post. Requires admin authorization.")
+    updateBlogPost(id: Int!, input: BlogPostUpdateInput!): BlogPost @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Post\\UpdateResolver") @doc(description: "Update an existing blog post. Requires admin authorization.")
+    deleteBlogPost(id: Int!): Boolean @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Post\\DeleteResolver") @doc(description: "Delete a blog post. Requires admin authorization.")
+
+    createBlogCategory(input: BlogCategoryCreateInput!): BlogCategory @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Category\\CreateResolver") @doc(description: "Create a new blog category. Requires admin authorization.")
+    updateBlogCategory(id: Int!, input: BlogCategoryUpdateInput!): BlogCategory @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Category\\UpdateResolver") @doc(description: "Update an existing blog category. Requires admin authorization.")
+    deleteBlogCategory(id: Int!): Boolean @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Category\\DeleteResolver") @doc(description: "Delete a blog category. Requires admin authorization.")
+
+    createBlogTag(input: BlogTagCreateInput!): BlogTag @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Tag\\CreateResolver") @doc(description: "Create a new blog tag. Requires admin authorization.")
+    updateBlogTag(id: Int!, input: BlogTagUpdateInput!): BlogTag @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Tag\\UpdateResolver") @doc(description: "Update an existing blog tag. Requires admin authorization.")
+    deleteBlogTag(id: Int!): Boolean @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Tag\\DeleteResolver") @doc(description: "Delete a blog tag. Requires admin authorization.")
+
+    createBlogAuthor(input: BlogAuthorCreateInput!): BlogAuthor @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Author\\CreateResolver") @doc(description: "Create a new blog author. Requires admin authorization.")
+    updateBlogAuthor(id: Int!, input: BlogAuthorUpdateInput!): BlogAuthor @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Author\\UpdateResolver") @doc(description: "Update an existing blog author. Requires admin authorization.")
+    deleteBlogAuthor(id: Int!): Boolean @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Author\\DeleteResolver") @doc(description: "Delete a blog author. Requires admin authorization.")
+}
+
+enum BlogPostStatusEnum @doc(description: "The lifecycle status of a blog post.") {
+    DRAFT
+    SCHEDULED
+    PUBLISHED
+    ARCHIVED
+}
+
+type BlogPost @doc(description: "A blog post.") {
+    id: Int! @doc(description: "The unique ID of the blog post.")
+    url_key: String! @doc(description: "The URL key used to build the storefront permalink.")
+    title: String! @doc(description: "The post title.")
+    content: String @doc(description: "The post body (HTML).")
+    short_content: String @doc(description: "A short excerpt shown in listings.")
+    featured_image: String @doc(description: "The featured image path (relative to media/mageos_blog).")
+    featured_image_alt: String @doc(description: "Alt text for the featured image.")
+    author_id: Int @doc(description: "ID of the author of this post.")
+    author: BlogAuthor @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Post\\AuthorResolver") @doc(description: "The author of this post, if any.")
+    publish_date: String @doc(description: "ISO 8601 date/time the post was published or is scheduled to publish.")
+    reading_time: Int @doc(description: "Estimated reading time in minutes.")
+    views_count: Int! @doc(description: "The number of times this post has been viewed.")
+    status: BlogPostStatusEnum! @doc(description: "The post lifecycle status.")
+    meta_title: String
+    meta_description: String
+    meta_keywords: String
+    meta_robots: String
+    og_title: String
+    og_description: String
+    og_image: String
+    og_type: String
+    store_ids: [Int!]! @doc(description: "Store view IDs this post is visible in.")
+    category_ids: [Int!]! @doc(description: "Category IDs this post is assigned to.")
+    categories: [BlogCategory!]! @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Post\\CategoriesResolver") @doc(description: "The categories this post is assigned to.")
+    tag_ids: [Int!]! @doc(description: "Tag IDs assigned to this post.")
+    tags: [BlogTag!]! @resolver(class: "\\MageOS\\Blog\\Model\\Resolver\\Post\\TagsResolver") @doc(description: "The tags assigned to this post.")
+}
+
+type BlogPosts @doc(description: "A paginated list of blog posts.") {
+    items: [BlogPost!]! @doc(description: "The blog posts on the current page.")
+    page_info: SearchResultPageInfo! @doc(description: "Pagination metadata.")
+    total_count: Int! @doc(description: "The total number of matching posts across all pages.")
+}
+
+input BlogPostFilterInput @doc(description: "Defines filters that can be applied to blog post queries.") {
+    id: FilterEqualTypeInput
+    title: FilterMatchTypeInput
+    url_key: FilterEqualTypeInput
+    author_id: FilterEqualTypeInput
+    status: FilterEqualTypeInput
+    category_id: FilterEqualTypeInput @doc(description: "Filter posts by assigned category ID.")
+    tag_id: FilterEqualTypeInput @doc(description: "Filter posts by assigned tag ID.")
+    publish_date: FilterRangeTypeInput
+    store_id: FilterEqualTypeInput
+}
+
+input BlogPostSortInput @doc(description: "Defines a sort order for a blog post query.") {
+    publish_date: SortEnum
+    title: SortEnum
+    views_count: SortEnum
+    reading_time: SortEnum
+    id: SortEnum
+}
+
+input BlogPostCreateInput @doc(description: "Input for createBlogPost mutation.") {
+    url_key: String @doc(description: "Optional — auto-generated from title when omitted.")
+    title: String!
+    content: String
+    short_content: String
+    featured_image: String
+    featured_image_alt: String
+    author_id: Int
+    publish_date: String
+    status: BlogPostStatusEnum = DRAFT
+    meta_title: String
+    meta_description: String
+    meta_keywords: String
+    meta_robots: String
+    og_title: String
+    og_description: String
+    og_image: String
+    og_type: String
+    store_ids: [Int!]
+    category_ids: [Int!]
+    tag_ids: [Int!]
+}
+
+input BlogPostUpdateInput @doc(description: "Input for updateBlogPost mutation. All fields optional.") {
+    url_key: String
+    title: String
+    content: String
+    short_content: String
+    featured_image: String
+    featured_image_alt: String
+    author_id: Int
+    publish_date: String
+    status: BlogPostStatusEnum
+    meta_title: String
+    meta_description: String
+    meta_keywords: String
+    meta_robots: String
+    og_title: String
+    og_description: String
+    og_image: String
+    og_type: String
+    store_ids: [Int!]
+    category_ids: [Int!]
+    tag_ids: [Int!]
+}
+
+type BlogCategory @doc(description: "A blog category.") {
+    id: Int!
+    url_key: String!
+    title: String!
+    description: String
+    parent_id: Int
+    position: Int!
+    meta_title: String
+    meta_description: String
+    meta_keywords: String
+    include_in_menu: Boolean!
+    include_in_sidebar: Boolean!
+    is_active: Boolean!
+    store_ids: [Int!]!
+}
+
+type BlogCategories @doc(description: "A paginated list of blog categories.") {
+    items: [BlogCategory!]!
+    page_info: SearchResultPageInfo!
+    total_count: Int!
+}
+
+input BlogCategoryFilterInput {
+    id: FilterEqualTypeInput
+    title: FilterMatchTypeInput
+    url_key: FilterEqualTypeInput
+    parent_id: FilterEqualTypeInput
+    is_active: FilterEqualTypeInput
+    include_in_menu: FilterEqualTypeInput
+    store_id: FilterEqualTypeInput
+}
+
+input BlogCategorySortInput {
+    title: SortEnum
+    position: SortEnum
+    id: SortEnum
+}
+
+input BlogCategoryCreateInput {
+    url_key: String
+    title: String!
+    description: String
+    parent_id: Int
+    position: Int
+    meta_title: String
+    meta_description: String
+    meta_keywords: String
+    include_in_menu: Boolean
+    include_in_sidebar: Boolean
+    is_active: Boolean
+    store_ids: [Int!]
+}
+
+input BlogCategoryUpdateInput {
+    url_key: String
+    title: String
+    description: String
+    parent_id: Int
+    position: Int
+    meta_title: String
+    meta_description: String
+    meta_keywords: String
+    include_in_menu: Boolean
+    include_in_sidebar: Boolean
+    is_active: Boolean
+    store_ids: [Int!]
+}
+
+type BlogTag @doc(description: "A blog tag.") {
+    id: Int!
+    url_key: String!
+    title: String!
+    description: String
+    meta_title: String
+    meta_description: String
+    is_active: Boolean!
+    store_ids: [Int!]!
+}
+
+type BlogTags @doc(description: "A paginated list of blog tags.") {
+    items: [BlogTag!]!
+    page_info: SearchResultPageInfo!
+    total_count: Int!
+}
+
+input BlogTagFilterInput {
+    id: FilterEqualTypeInput
+    title: FilterMatchTypeInput
+    url_key: FilterEqualTypeInput
+    is_active: FilterEqualTypeInput
+    store_id: FilterEqualTypeInput
+}
+
+input BlogTagSortInput {
+    title: SortEnum
+    id: SortEnum
+}
+
+input BlogTagCreateInput {
+    url_key: String
+    title: String!
+    description: String
+    meta_title: String
+    meta_description: String
+    is_active: Boolean
+    store_ids: [Int!]
+}
+
+input BlogTagUpdateInput {
+    url_key: String
+    title: String
+    description: String
+    meta_title: String
+    meta_description: String
+    is_active: Boolean
+    store_ids: [Int!]
+}
+
+type BlogAuthor @doc(description: "A blog author.") {
+    id: Int!
+    slug: String!
+    name: String!
+    bio: String
+    avatar: String
+    email: String
+    twitter: String
+    linkedin: String
+    website: String
+    is_active: Boolean!
+}
+
+type BlogAuthors @doc(description: "A paginated list of blog authors.") {
+    items: [BlogAuthor!]!
+    page_info: SearchResultPageInfo!
+    total_count: Int!
+}
+
+input BlogAuthorFilterInput {
+    id: FilterEqualTypeInput
+    name: FilterMatchTypeInput
+    slug: FilterEqualTypeInput
+    is_active: FilterEqualTypeInput
+}
+
+input BlogAuthorSortInput {
+    name: SortEnum
+    id: SortEnum
+}
+
+input BlogAuthorCreateInput {
+    slug: String
+    name: String!
+    bio: String
+    avatar: String
+    email: String
+    twitter: String
+    linkedin: String
+    website: String
+    is_active: Boolean
+}
+
+input BlogAuthorUpdateInput {
+    slug: String
+    name: String
+    bio: String
+    avatar: String
+    email: String
+    twitter: String
+    linkedin: String
+    website: String
+    is_active: Boolean
+}
+
+enum UrlRewriteEntityTypeEnum @doc(description: "Extended with blog entity types.") {
+    BLOG_POST
+    BLOG_CATEGORY
+    BLOG_TAG
+    BLOG_AUTHOR
+}

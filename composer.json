@@ -17,6 +17,7 @@
         "magento/module-sitemap": "*",
         "magento/module-widget": "*",
         "magento/module-graph-ql": "*",
+        "magento/module-url-rewrite-graph-ql": "*",
         "magento/module-media-storage": "*"
     },
     "require-dev": {
