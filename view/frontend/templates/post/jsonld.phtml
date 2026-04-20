@@ -1,0 +1,16 @@
+<?php
+
+declare(strict_types=1);
+
+/** @var \MageOS\Blog\Block\Post\JsonLd $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+use MageOS\Blog\ViewModel\Post\Detail as PostDetail;
+
+/** @var PostDetail $viewModel */
+$viewModel = $block->getData('view_model');
+$json = $viewModel->getJsonLd();
+?>
+<?php if ($json !== ''): ?>
+    <script type="application/ld+json"><?= /* @noEscape */ $json ?></script>
+<?php endif; ?>

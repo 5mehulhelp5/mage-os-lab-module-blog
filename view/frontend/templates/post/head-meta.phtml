@@ -1,0 +1,24 @@
+<?php
+
+declare(strict_types=1);
+
+/** @var \MageOS\Blog\Block\Post\HeadMeta $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+use MageOS\Blog\ViewModel\Post\Detail as PostDetail;
+
+/** @var PostDetail $viewModel */
+$viewModel = $block->getData('view_model');
+?>
+<?php foreach ($viewModel->getOgTags() as $property => $content): ?>
+    <meta property="<?= $escaper->escapeHtmlAttr($property) ?>"
+          content="<?= $escaper->escapeHtmlAttr($content) ?>"/>
+<?php endforeach; ?>
+<?php foreach ($viewModel->getTwitterTags() as $name => $content): ?>
+    <meta name="<?= $escaper->escapeHtmlAttr($name) ?>"
+          content="<?= $escaper->escapeHtmlAttr($content) ?>"/>
+<?php endforeach; ?>
+<?php $canonical = $viewModel->getCanonicalUrl(); ?>
+<?php if ($canonical !== ''): ?>
+    <link rel="canonical" href="<?= $escaper->escapeUrl($canonical) ?>"/>
+<?php endif; ?>
