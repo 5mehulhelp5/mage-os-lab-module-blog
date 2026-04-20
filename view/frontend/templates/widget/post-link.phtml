@@ -1,0 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+/** @var \MageOS\Blog\Block\Widget\PostLink $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$post = $block->getPost();
+?>
+<?php if ($post !== null): ?>
+    <a class="mageos-blog-widget mageos-blog-widget--post-link"
+       href="<?= $escaper->escapeUrl($block->getPostUrl($post)); ?>">
+        <?= $escaper->escapeHtml($block->getLabel($post)); ?>
+    </a>
+<?php endif; ?>
