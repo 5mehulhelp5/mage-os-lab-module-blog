@@ -259,20 +259,50 @@
             <label translate="true">Taxonomy</label>
             <collapsible>true</collapsible>
         </settings>
-        <field name="category_ids" formElement="input" sortOrder="10">
+        <field name="category_ids" formElement="multiselect" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filterOptions" xsi:type="boolean">true</item>
+                    <item name="chipsEnabled" xsi:type="boolean">true</item>
+                    <item name="disableLabel" xsi:type="boolean">true</item>
+                    <item name="levelsVisibility" xsi:type="string">1</item>
+                    <item name="elementTmpl" xsi:type="string">ui/grid/filters/elements/ui-select</item>
+                </item>
+            </argument>
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">Category IDs (comma-separated)</label>
+                <label translate="true">Categories</label>
                 <dataScope>category_ids</dataScope>
-                <notice translate="true">Multi-select with tree UI lands in task 2.5/2.6.</notice>
             </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="MageOS\Blog\Ui\Component\Form\Categories\Options"/>
+                    </settings>
+                </multiselect>
+            </formElements>
         </field>
-        <field name="tag_ids" formElement="input" sortOrder="20">
+        <field name="tag_ids" formElement="multiselect" sortOrder="20">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filterOptions" xsi:type="boolean">true</item>
+                    <item name="chipsEnabled" xsi:type="boolean">true</item>
+                    <item name="disableLabel" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">ui/grid/filters/elements/ui-select</item>
+                </item>
+            </argument>
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">Tag IDs (comma-separated)</label>
+                <label translate="true">Tags</label>
                 <dataScope>tag_ids</dataScope>
             </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="MageOS\Blog\Ui\Component\Form\Tags\Options"/>
+                    </settings>
+                </multiselect>
+            </formElements>
         </field>
     </fieldset>
 
@@ -281,21 +311,67 @@
             <label translate="true">Related</label>
             <collapsible>true</collapsible>
         </settings>
-        <field name="related_post_ids" formElement="input" sortOrder="10">
+        <field name="related_post_ids" formElement="multiselect" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filterOptions" xsi:type="boolean">true</item>
+                    <item name="chipsEnabled" xsi:type="boolean">true</item>
+                    <item name="disableLabel" xsi:type="boolean">true</item>
+                    <item name="elementTmpl" xsi:type="string">ui/grid/filters/elements/ui-select</item>
+                </item>
+            </argument>
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">Related Post IDs (comma-separated)</label>
+                <label translate="true">Related Posts</label>
                 <dataScope>related_post_ids</dataScope>
-                <notice translate="true">Nested listing UI lands in task 2.4.</notice>
             </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="MageOS\Blog\Ui\Component\Form\RelatedPosts\Options"/>
+                    </settings>
+                </multiselect>
+            </formElements>
         </field>
-        <field name="related_product_ids" formElement="input" sortOrder="20">
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Related Product IDs (comma-separated)</label>
-                <dataScope>related_product_ids</dataScope>
-            </settings>
-        </field>
+        <container name="related_product_ids_container" sortOrder="20">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Related Products</item>
+                </item>
+            </argument>
+            <insertListing name="related_product_ids_listing"
+                           sortOrder="10"
+                           component="Magento_Ui/js/form/components/insert-listing">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="autoRender" xsi:type="boolean">true</item>
+                        <item name="dataScope" xsi:type="string">related_product_ids</item>
+                        <item name="externalProvider" xsi:type="string">product_listing.product_listing_data_source</item>
+                        <item name="selectionsProvider" xsi:type="string">product_listing.product_listing.product_columns.ids</item>
+                        <item name="ns" xsi:type="string">product_listing</item>
+                        <item name="render_url" xsi:type="url" path="mui/index/render"/>
+                        <item name="realTimeLink" xsi:type="boolean">true</item>
+                        <item name="behaviourType" xsi:type="string">simple</item>
+                        <item name="externalFilterMode" xsi:type="boolean">true</item>
+                        <item name="imports" xsi:type="array">
+                            <item name="productIds" xsi:type="string">${ $.provider }:${ $.dataProvider }</item>
+                        </item>
+                        <item name="exports" xsi:type="array">
+                            <item name="productIds" xsi:type="string">${ $.provider }:${ $.dataProvider }</item>
+                        </item>
+                    </item>
+                </argument>
+                <settings>
+                    <dataLinks>
+                        <exports>true</exports>
+                        <imports>true</imports>
+                    </dataLinks>
+                    <listens>
+                        <link name="${ $.externalProvider }:params.filters">evaluateExternalFilters</link>
+                    </listens>
+                </settings>
+            </insertListing>
+        </container>
     </fieldset>
 
     <fieldset name="stores" sortOrder="70">

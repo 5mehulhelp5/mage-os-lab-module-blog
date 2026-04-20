@@ -31,6 +31,8 @@ interface PostInterface extends ExtensibleDataInterface
     public const STORE_IDS = 'store_ids';
     public const CATEGORY_IDS = 'category_ids';
     public const TAG_IDS = 'tag_ids';
+    public const RELATED_POST_IDS = 'related_post_ids';
+    public const RELATED_PRODUCT_IDS = 'related_product_ids';
 
     public function getPostId(): ?int;
     public function setPostId(int $id): self;
@@ -84,6 +86,14 @@ interface PostInterface extends ExtensibleDataInterface
     public function getTagIds(): array;
     /** @param int[] $ids */
     public function setTagIds(array $ids): self;
+    /** @return int[] */
+    public function getRelatedPostIds(): array;
+    /** @param int[] $ids */
+    public function setRelatedPostIds(array $ids): self;
+    /** @return int[] */
+    public function getRelatedProductIds(): array;
+    /** @param int[] $ids */
+    public function setRelatedProductIds(array $ids): self;
 
     public function getExtensionAttributes(): ?PostExtensionInterface;
     public function setExtensionAttributes(PostExtensionInterface $extensionAttributes): self;

@@ -6,9 +6,9 @@ namespace MageOS\Blog\ViewModel\Search;
 
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Sql\Expression;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
-use Magento\Framework\DB\Sql\Expression;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use MageOS\Blog\Api\Data\PostInterface;

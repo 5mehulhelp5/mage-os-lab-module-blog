@@ -276,6 +276,28 @@ class Post extends AbstractExtensibleModel implements PostInterface, IdentityInt
         return $this->setData(self::TAG_IDS, array_map('intval', $ids));
     }
 
+    public function getRelatedPostIds(): array
+    {
+        $ids = $this->getData(self::RELATED_POST_IDS);
+        return \is_array($ids) ? array_map('intval', $ids) : [];
+    }
+
+    public function setRelatedPostIds(array $ids): self
+    {
+        return $this->setData(self::RELATED_POST_IDS, array_map('intval', $ids));
+    }
+
+    public function getRelatedProductIds(): array
+    {
+        $ids = $this->getData(self::RELATED_PRODUCT_IDS);
+        return \is_array($ids) ? array_map('intval', $ids) : [];
+    }
+
+    public function setRelatedProductIds(array $ids): self
+    {
+        return $this->setData(self::RELATED_PRODUCT_IDS, array_map('intval', $ids));
+    }
+
     public function getExtensionAttributes(): ?PostExtensionInterface
     {
         /** @var ?PostExtensionInterface $value */
