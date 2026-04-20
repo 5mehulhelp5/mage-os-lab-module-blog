@@ -1,0 +1,44 @@
+<?php
+
+declare(strict_types=1);
+
+/** @var \MageOS\Blog\Block\Post\Listing $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+use MageOS\Blog\ViewModel\Post\Listing as PostListing;
+
+/** @var PostListing $viewModel */
+$viewModel = $block->getData('view_model');
+$items = $viewModel->getItems();
+?>
+<div class="mageos-blog-listing">
+    <h1 class="mageos-blog-listing__title"><?= $escaper->escapeHtml(__('Blog')); ?></h1>
+
+    <?php if (count($items) === 0): ?>
+        <p class="mageos-blog-listing__empty"><?= $escaper->escapeHtml(__('No posts yet.')); ?></p>
+    <?php else: ?>
+        <ul class="mageos-blog-listing__items">
+            <?php foreach ($items as $post): ?>
+                <?= $block->getLayout()
+                    ->createBlock(\MageOS\Blog\Block\Post\Listing::class)
+                    ->setTemplate('MageOS_Blog::post/item.phtml')
+                    ->setData('post', $post)
+                    ->setData('view_model', $viewModel)
+                    ->toHtml(); ?>
+            <?php endforeach; ?>
+        </ul>
+
+        <?php $totalPages = $viewModel->getTotalPages(); ?>
+        <?php if ($totalPages > 1): ?>
+            <nav class="mageos-blog-listing__pagination" aria-label="<?= $escaper->escapeHtmlAttr(__('Blog pagination')); ?>">
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <?php if ($i === $viewModel->getCurrentPage()): ?>
+                        <span class="current"><?= (int) $i; ?></span>
+                    <?php else: ?>
+                        <a href="<?= $escaper->escapeUrl($viewModel->getPageUrl($i)); ?>"><?= (int) $i; ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+            </nav>
+        <?php endif; ?>
+    <?php endif; ?>
+</div>
