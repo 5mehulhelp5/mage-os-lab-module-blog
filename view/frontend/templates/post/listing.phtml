@@ -11,33 +11,44 @@ use MageOS\Blog\ViewModel\Post\Listing as PostListing;
 $viewModel = $block->getData('view_model');
 $items = $viewModel->getItems();
 ?>
-<div class="mageos-blog-listing">
-    <h1 class="mageos-blog-listing__title"><?= $escaper->escapeHtml(__('Blog')); ?></h1>
-
-    <?php if (count($items) === 0): ?>
-        <p class="mageos-blog-listing__empty"><?= $escaper->escapeHtml(__('No posts yet.')); ?></p>
+<div class="mageos-blog mageos-blog-container">
+    <?php if ($items === []): ?>
+        <p class="mageos-blog-empty">
+            <?= $escaper->escapeHtml(__('No posts yet.')); ?>
+        </p>
     <?php else: ?>
-        <ul class="mageos-blog-listing__items">
+        <div class="mageos-blog-cards">
             <?php foreach ($items as $post): ?>
                 <?= $block->getLayout()
-                    ->createBlock(\MageOS\Blog\Block\Post\Listing::class)
-                    ->setTemplate('MageOS_Blog::post/item.phtml')
+                    ->createBlock(\Magento\Framework\View\Element\Template::class)
+                    ->setTemplate('MageOS_Blog::post/card.phtml')
                     ->setData('post', $post)
                     ->setData('view_model', $viewModel)
                     ->toHtml(); ?>
             <?php endforeach; ?>
-        </ul>
+        </div>
 
         <?php $totalPages = $viewModel->getTotalPages(); ?>
         <?php if ($totalPages > 1): ?>
-            <nav class="mageos-blog-listing__pagination" aria-label="<?= $escaper->escapeHtmlAttr(__('Blog pagination')); ?>">
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <?php if ($i === $viewModel->getCurrentPage()): ?>
-                        <span class="current"><?= (int) $i; ?></span>
+            <nav class="mageos-blog-pagination" aria-label="<?= $escaper->escapeHtmlAttr(__('Pagination')); ?>">
+                <?php $current = $viewModel->getCurrentPage(); ?>
+                <?php if ($current > 1): ?>
+                    <a rel="prev" href="<?= $escaper->escapeUrl($viewModel->getPageUrl($current - 1)); ?>">
+                        <?= $escaper->escapeHtml(__('← Previous')); ?>
+                    </a>
+                <?php endif; ?>
+                <?php for ($page = 1; $page <= $totalPages; $page++): ?>
+                    <?php if ($page === $current): ?>
+                        <span class="mageos-blog-pagination__current"><?= (int) $page; ?></span>
                     <?php else: ?>
-                        <a href="<?= $escaper->escapeUrl($viewModel->getPageUrl($i)); ?>"><?= (int) $i; ?></a>
+                        <a href="<?= $escaper->escapeUrl($viewModel->getPageUrl($page)); ?>"><?= (int) $page; ?></a>
                     <?php endif; ?>
                 <?php endfor; ?>
+                <?php if ($current < $totalPages): ?>
+                    <a rel="next" href="<?= $escaper->escapeUrl($viewModel->getPageUrl($current + 1)); ?>">
+                        <?= $escaper->escapeHtml(__('Next →')); ?>
+                    </a>
+                <?php endif; ?>
             </nav>
         <?php endif; ?>
     <?php endif; ?>
