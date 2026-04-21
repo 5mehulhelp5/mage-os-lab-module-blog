@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-/** @var \MageOS\Blog\Block\Search\Results $block */
+/** @var \Magento\Framework\View\Element\Template $block */
 /** @var \Magento\Framework\Escaper $escaper */
 
 use MageOS\Blog\ViewModel\Search\Results as SearchResults;
@@ -13,49 +13,53 @@ $query = $viewModel->getQuery();
 $items = $viewModel->getItems();
 $total = $viewModel->getTotalCount();
 ?>
-<div class="mageos-blog-search">
-    <h1 class="mageos-blog-search__title">
-        <?= $escaper->escapeHtml(__('Search: %1', $query)); ?>
-    </h1>
-    <p class="mageos-blog-search__meta">
-        <?= $escaper->escapeHtml(__('%1 result(s)', $total)); ?>
-    </p>
+<div class="mageos-blog mageos-blog-container">
+    <header class="mageos-blog-context">
+        <h1 class="mageos-blog-context__title">
+            <?= $escaper->escapeHtml(__('Search results for "%1"', $query)); ?>
+        </h1>
+        <?php if ($total > 0): ?>
+            <div class="mageos-blog-context__description">
+                <?= $escaper->escapeHtml(__('%1 matching posts', $total)); ?>
+            </div>
+        <?php endif; ?>
+    </header>
 
-    <?php if (count($items) === 0): ?>
-        <p class="mageos-blog-search__empty">
-            <?= $escaper->escapeHtml(__('No posts match "%1".', $query)); ?>
-        </p>
+    <?php if ($items === []): ?>
+        <p class="mageos-blog-empty"><?= $escaper->escapeHtml(__('No posts matched your search.')); ?></p>
     <?php else: ?>
-        <ul class="mageos-blog-search__items">
+        <div class="mageos-blog-cards">
             <?php foreach ($items as $post): ?>
-                <li class="mageos-blog-search__item">
-                    <article>
-                        <h2>
-                            <a href="<?= $escaper->escapeUrl($viewModel->getPostUrl($post)); ?>">
-                                <?= $escaper->escapeHtml($post->getTitle()); ?>
-                            </a>
-                        </h2>
-                        <?php if ($post->getShortContent()): ?>
-                            <div class="mageos-blog-search__item-excerpt">
-                                <?= /** @noEscape */ $post->getShortContent(); ?>
-                            </div>
-                        <?php endif; ?>
-                    </article>
-                </li>
+                <?= $block->getLayout()
+                    ->createBlock(\Magento\Framework\View\Element\Template::class)
+                    ->setTemplate('MageOS_Blog::post/card.phtml')
+                    ->setData('post', $post)
+                    ->setData('view_model', $viewModel)
+                    ->toHtml(); ?>
             <?php endforeach; ?>
-        </ul>
+        </div>
 
         <?php $totalPages = $viewModel->getTotalPages(); ?>
         <?php if ($totalPages > 1): ?>
-            <nav class="mageos-blog-search__pagination"
-                 aria-label="<?= $escaper->escapeHtmlAttr(__('Search pagination')); ?>">
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <?php if ($i === $viewModel->getCurrentPage()): ?>
-                        <span class="current"><?= (int) $i; ?></span>
+            <nav class="mageos-blog-pagination" aria-label="<?= $escaper->escapeHtmlAttr(__('Pagination')); ?>">
+                <?php $current = $viewModel->getCurrentPage(); ?>
+                <?php if ($current > 1): ?>
+                    <a rel="prev" href="<?= $escaper->escapeUrl($viewModel->getPageUrl($current - 1)); ?>">
+                        <?= $escaper->escapeHtml(__('← Previous')); ?>
+                    </a>
+                <?php endif; ?>
+                <?php for ($page = 1; $page <= $totalPages; $page++): ?>
+                    <?php if ($page === $current): ?>
+                        <span class="mageos-blog-pagination__current"><?= (int) $page; ?></span>
                     <?php else: ?>
-                        <a href="<?= $escaper->escapeUrl($viewModel->getPageUrl($i)); ?>"><?= (int) $i; ?></a>
+                        <a href="<?= $escaper->escapeUrl($viewModel->getPageUrl($page)); ?>"><?= (int) $page; ?></a>
                     <?php endif; ?>
                 <?php endfor; ?>
+                <?php if ($current < $totalPages): ?>
+                    <a rel="next" href="<?= $escaper->escapeUrl($viewModel->getPageUrl($current + 1)); ?>">
+                        <?= $escaper->escapeHtml(__('Next →')); ?>
+                    </a>
+                <?php endif; ?>
             </nav>
         <?php endif; ?>
     <?php endif; ?>
