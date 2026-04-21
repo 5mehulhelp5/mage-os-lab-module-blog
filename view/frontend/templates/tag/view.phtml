@@ -10,45 +10,32 @@ use MageOS\Blog\ViewModel\Tag\Detail as TagDetail;
 /** @var TagDetail $viewModel */
 $viewModel = $block->getData('view_model');
 $tag = $viewModel->getTag();
+if ($tag === null) {
+    return;
+}
+$posts = $viewModel->getPosts();
+$description = $viewModel->getDescription();
 ?>
-<?php if ($tag !== null): ?>
-    <section class="mageos-blog-tag">
-        <header class="mageos-blog-tag__header">
-            <h1 class="mageos-blog-tag__title"><?= $escaper->escapeHtml($viewModel->getTitle()); ?></h1>
-        </header>
-
-        <?php $description = $viewModel->getDescription(); ?>
+<div class="mageos-blog mageos-blog-container">
+    <header class="mageos-blog-context">
+        <h1 class="mageos-blog-context__title"><?= $escaper->escapeHtml($viewModel->getTitle()); ?></h1>
         <?php if ($description !== null && $description !== ''): ?>
-            <div class="mageos-blog-tag__description">
-                <?= /** @noEscape */ $description; ?>
-            </div>
+            <div class="mageos-blog-context__description"><?= /** @noEscape */ $description; ?></div>
         <?php endif; ?>
+    </header>
 
-        <?php $posts = $viewModel->getPosts(); ?>
-        <?php if ($posts === []): ?>
-            <p class="mageos-blog-tag__empty">
-                <?= $escaper->escapeHtml(__('No posts tagged here yet.')); ?>
-            </p>
-        <?php else: ?>
-            <ul class="mageos-blog-tag__posts">
-                <?php foreach ($posts as $post): ?>
-                    <li class="mageos-blog-tag__post">
-                        <h2 class="mageos-blog-tag__post-title">
-                            <a href="<?= $escaper->escapeUrl($viewModel->getPostUrl($post)); ?>">
-                                <?= $escaper->escapeHtml($post->getTitle()); ?>
-                            </a>
-                        </h2>
-                        <?php $publishDate = $viewModel->getFormattedPublishDate($post); ?>
-                        <?php if ($publishDate !== ''): ?>
-                            <time class="mageos-blog-tag__post-date"><?= $escaper->escapeHtml($publishDate); ?></time>
-                        <?php endif; ?>
-                        <?php $excerpt = (string) $post->getShortContent(); ?>
-                        <?php if ($excerpt !== ''): ?>
-                            <p class="mageos-blog-tag__post-excerpt"><?= $escaper->escapeHtml($excerpt); ?></p>
-                        <?php endif; ?>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        <?php endif; ?>
-    </section>
-<?php endif; ?>
+    <?php if ($posts === []): ?>
+        <p class="mageos-blog-empty"><?= $escaper->escapeHtml(__('No posts tagged here yet.')); ?></p>
+    <?php else: ?>
+        <div class="mageos-blog-cards">
+            <?php foreach ($posts as $post): ?>
+                <?= $block->getLayout()
+                    ->createBlock(\Magento\Framework\View\Element\Template::class)
+                    ->setTemplate('MageOS_Blog::post/card.phtml')
+                    ->setData('post', $post)
+                    ->setData('view_model', $viewModel)
+                    ->toHtml(); ?>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</div>
