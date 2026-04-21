@@ -136,10 +136,11 @@
                 <label translate="true">Active</label>
             </settings>
         </column>
-        <column name="parent_id">
+        <column name="parent_id" class="MageOS\Blog\Ui\Component\Listing\Column\ParentCategoryName">
             <settings>
-                <filter>textRange</filter>
-                <label translate="true">Parent ID</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <sortable>true</sortable>
+                <label translate="true">Parent Category</label>
             </settings>
         </column>
         <column name="position">
