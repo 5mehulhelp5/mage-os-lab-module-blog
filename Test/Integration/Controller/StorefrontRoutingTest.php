@@ -12,7 +12,6 @@ use MageOS\Blog\Api\Data\PostInterfaceFactory;
 use MageOS\Blog\Api\PostRepositoryInterface;
 use MageOS\Blog\Model\BlogPostStatus;
 use MageOS\Blog\Model\Config;
-use MageOS\Blog\Model\PostRepository;
 
 class StorefrontRoutingTest extends AbstractController
 {
@@ -23,8 +22,7 @@ class StorefrontRoutingTest extends AbstractController
     {
         parent::setUp();
         $objectManager = Bootstrap::getObjectManager();
-        $this->repository = $objectManager->get(PostRepositoryInterface::class)
-            ?? $objectManager->get(PostRepository::class);
+        $this->repository = $objectManager->get(PostRepositoryInterface::class);
         $this->postFactory = $objectManager->get(PostInterfaceFactory::class);
 
         /** @var MutableScopeConfigInterface $scopeConfig */
