@@ -11,6 +11,10 @@ use MageOS\Blog\Api\PostRepositoryInterface;
 use MageOS\Blog\Model\BlogPostStatus;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @magentoAppArea adminhtml
+ * @magentoDbIsolation enabled
+ */
 final class PostManagementTest extends TestCase
 {
     private PostManagementInterface $management;

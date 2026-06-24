@@ -14,6 +14,10 @@ use MageOS\Blog\Model\BlogPostStatus;
 use MageOS\Blog\Model\Config;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @magentoAppArea adminhtml
+ * @magentoDbIsolation enabled
+ */
 final class PublishScheduledPostsTest extends TestCase
 {
     private PublishScheduledPosts $cron;

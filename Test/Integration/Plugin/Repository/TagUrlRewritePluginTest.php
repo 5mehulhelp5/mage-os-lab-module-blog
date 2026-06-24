@@ -11,6 +11,10 @@ use MageOS\Blog\Api\TagRepositoryInterface;
 use MageOS\Blog\Model\Url\UrlRewriteBuilder;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @magentoAppArea adminhtml
+ * @magentoDbIsolation enabled
+ */
 final class TagUrlRewritePluginTest extends TestCase
 {
     private TagRepositoryInterface $repository;

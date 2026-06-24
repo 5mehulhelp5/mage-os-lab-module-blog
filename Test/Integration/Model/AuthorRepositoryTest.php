@@ -13,6 +13,10 @@ use MageOS\Blog\Api\Data\AuthorInterface;
 use MageOS\Blog\Api\Data\AuthorInterfaceFactory;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @magentoAppArea adminhtml
+ * @magentoDbIsolation enabled
+ */
 final class AuthorRepositoryTest extends TestCase
 {
     private AuthorRepositoryInterface $repository;

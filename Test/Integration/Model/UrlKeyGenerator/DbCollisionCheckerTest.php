@@ -10,6 +10,10 @@ use MageOS\Blog\Api\UrlKeyGeneratorInterface;
 use MageOS\Blog\Model\UrlKeyGenerator\CollisionChecker;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @magentoAppArea adminhtml
+ * @magentoDbIsolation enabled
+ */
 final class DbCollisionCheckerTest extends TestCase
 {
     private CollisionChecker $checker;

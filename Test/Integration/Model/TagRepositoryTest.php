@@ -13,6 +13,10 @@ use MageOS\Blog\Api\Data\TagInterfaceFactory;
 use MageOS\Blog\Api\TagRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @magentoAppArea adminhtml
+ * @magentoDbIsolation enabled
+ */
 final class TagRepositoryTest extends TestCase
 {
     private TagRepositoryInterface $repository;

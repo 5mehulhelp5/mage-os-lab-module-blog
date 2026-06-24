@@ -11,6 +11,10 @@ use MageOS\Blog\Api\Data\AuthorInterfaceFactory;
 use MageOS\Blog\Model\Url\UrlRewriteBuilder;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @magentoAppArea adminhtml
+ * @magentoDbIsolation enabled
+ */
 final class AuthorUrlRewritePluginTest extends TestCase
 {
     private AuthorRepositoryInterface $repository;

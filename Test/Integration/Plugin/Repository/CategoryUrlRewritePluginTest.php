@@ -11,6 +11,10 @@ use MageOS\Blog\Api\Data\CategoryInterfaceFactory;
 use MageOS\Blog\Model\Url\UrlRewriteBuilder;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @magentoAppArea adminhtml
+ * @magentoDbIsolation enabled
+ */
 final class CategoryUrlRewritePluginTest extends TestCase
 {
     private CategoryRepositoryInterface $repository;

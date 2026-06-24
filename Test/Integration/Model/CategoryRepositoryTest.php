@@ -13,6 +13,10 @@ use MageOS\Blog\Api\Data\CategoryInterface;
 use MageOS\Blog\Api\Data\CategoryInterfaceFactory;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @magentoAppArea adminhtml
+ * @magentoDbIsolation enabled
+ */
 final class CategoryRepositoryTest extends TestCase
 {
     private CategoryRepositoryInterface $repository;

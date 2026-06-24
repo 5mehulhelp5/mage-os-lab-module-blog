@@ -11,6 +11,10 @@ use MageOS\Blog\Api\PostRepositoryInterface;
 use MageOS\Blog\Model\Url\UrlRewriteBuilder;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @magentoAppArea adminhtml
+ * @magentoDbIsolation enabled
+ */
 final class PostUrlRewritePluginTest extends TestCase
 {
     private PostRepositoryInterface $repository;

@@ -13,6 +13,10 @@ use MageOS\Blog\Api\Data\PostInterfaceFactory;
 use MageOS\Blog\Api\PostRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @magentoAppArea adminhtml
+ * @magentoDbIsolation enabled
+ */
 final class PostRepositoryTest extends TestCase
 {
     private PostRepositoryInterface $repository;
