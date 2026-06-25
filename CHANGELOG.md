@@ -4,6 +4,43 @@ All notable changes to this project are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-06-25
+
+Admin usability and storefront-design release. No schema or API breaking changes; safe upgrade from 1.0.0.
+
+### Added
+
+- **Admin "no raw IDs" pickers.** The post form now uses real pickers instead of hand-typed entity IDs: author, category, tag, related-post, and related-product. The category form gains a hierarchical parent-category picker. Backed by new option sources under `Ui/Component/Form/{Authors,Categories,Tags,ParentCategory,RelatedPosts,RelatedProducts}/Options.php`. Related-post and related-product assignments now actually persist on save (`Model\Post\Link\RelatedPostLinkManager`, `RelatedProductLinkManager`, `Model\Post\PostsByAssignmentProvider`).
+- **Human-readable admin listings.** Linked author-name column on the post grid and a parent-category column on the category grid (`Ui/Component/Listing/Column/{AuthorName,ParentCategoryName}.php`).
+- **Storefront redesign.** New `view/frontend/web/css/blog.css` with a typography scale, layout primitives, and card components. Shared `post/card.phtml` (replacing `post/item.phtml`), hero-on-top post cards with pagination, a redesigned post-detail page (hero, tag chips, related posts), and context headers on category / tag / author / search pages.
+- **API surface.** Additional data fields and interface docblocks on `Api\Data\{Author,Category,Post,Tag}Interface` (cleans up `setup:di:compile`).
+- **Project docs & CI.** `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, GitHub issue/PR templates, and a GitHub Actions CI workflow.
+
+### Changed
+
+- **Naming.** Module name references aligned to the `mage-os` naming convention (PR #12).
+- **Layout.** Blog storefront switched to a 1-column layout; Luma sidebar bleed removed. Body / heading / post-content type scale bumped; `.mageos-blog-container` left-aligned.
+- **Compatibility.** Widened the `magento/framework` constraint to support Magento 2.4.6-p15.
+
+### Fixed
+
+- Double `<h1>` on category / tag / author / search pages (removed redundant `page.main.title`).
+- Author avatar upload (dropped an invalid nested `xsi:type="string"` param).
+- Admin form rendering and category / tag / author storefront post listings; flattened per-entity DataProvider row shapes and stringified IDs for ui-select.
+- `setStringify`/escaping fixes and numerous PHPCS warnings cleared; integration and unit test suites updated for 2.4.6-p15, 2.4.7-p10, 2.4.8-p5 & 2.4.9 & Equivilent MageOS versions.
+
+### Deferred
+
+The following items were listed under "Deferred to v1.1" in the 1.0.0 release but are not included in 1.1.0. They remain planned for a future release:
+
+- Comments (native, moderation, spam, email).
+- Content importers from Mageplaza, Magefan, Aheadworks, Mirasvit, WordPress (planned as a separate `mage-os/module-blog-migration` package).
+- OpenSearch / `Magento_Search` indexer + mview + `etc/search_request.xml`.
+- PageBuilder content editing.
+- Hyvä-native `.phtml` set (detection plugin is in place; the companion `mage-os/module-blog-hyva` package remains pending — see README).
+- Configurable URL prefix, custom per-page CSS, preview-token model, Commerce-only AdminGWS plugin, MFTF tests, gravatar autofetch, per-post multi-language content variants.
+- Infection MSI ≥ 75% / Covered MSI ≥ 80%.
+
 ## [1.0.0] - 2026-04-20
 
 First release of the greenfield rewrite. No migration path from pre-v1 forks.
@@ -38,4 +75,5 @@ Design inspired by [Magefan Blog](https://magefan.com/magento2-blog-extension) (
 - Configurable URL prefix, custom per-page CSS, preview-token model, Commerce-only AdminGWS plugin, MFTF tests, gravatar autofetch, per-post multi-language content variants.
 - Infection MSI ≥ 75% / Covered MSI ≥ 80%. v1.0 ships at 54% / 70% respectively; raising the floor depends on expanding unit-test coverage into `ViewModel/Post/Detail` (JSON-LD shape edge cases) and `Model/HyvaThemeDetection` (theme-chain walking).
 
+[1.1.0]: https://github.com/mage-os/module-blog/releases/tag/v1.1.0
 [1.0.0]: https://github.com/mage-os/module-blog/releases/tag/v1.0.0

@@ -12,7 +12,7 @@ bin/magento setup:di:compile
 bin/magento cache:clean
 ```
 
-For Hyvä storefronts, a template companion (`mageos/module-blog-hyva`) is planned for v1.1; v1.0 renders Luma templates on Hyvä via graceful fallback.
+For Hyvä storefronts, a template companion (`mage-os/module-blog-hyva`) is planned for v1.2; v1.0 renders Luma templates on Hyvä via graceful fallback.
 
 ## Enable
 
@@ -36,12 +36,16 @@ All settings live under **Stores → Configuration → Blog → Blog**.
 
 ## Compatibility
 
-| | PHP 8.2 | PHP 8.3 |
-| --- | --- | --- |
-| Magento 2.4.6 | yes | yes |
-| Magento 2.4.7 | yes | yes |
-| Hyvä 1.3+ | yes | yes |
-| Luma | yes | yes |
+| | PHP 8.2 | PHP 8.3 | PHP 8.4 |
+| --- | --- | --- | --- |
+| Magento 2.4.6 | yes | yes | — |
+| Magento 2.4.7 | yes | yes | — |
+| Magento 2.4.8 | — | yes | yes |
+| Magento 2.4.9 | — | yes | yes |
+| Hyvä 1.3+ | yes | yes | yes |
+| Luma | yes | yes | yes |
+
+Tested against Magento 2.4.6-p15, 2.4.7-p10, 2.4.8-p5, and 2.4.9, plus the equivalent Mage-OS releases.
 
 Requires `magento/module-url-rewrite-graph-ql` for the GraphQL URL resolver integration.
 
